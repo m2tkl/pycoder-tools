@@ -51,11 +51,11 @@ class TestMaker():
             """
             TODO: コンテスト中にエラーが発生するため修正が必要
                 - [] そもそも取得できているのかどうかを調査
-                - [] コンテスト中は日本語，英語両方でなく
-                    日本語のみで一回だけextractすれば良いのか調査
+                - [x] 日本語，英語両方でなく日本語のみで一回だけextractすれば良いのか調査
+                    => io-styleの要素が1回しか出現しないページがあることが判明
             """
-            soup.find('div', class_='io-style').extract()
-            soup.find('div', class_='io-style').extract()
+            while soup.find('div', class_='io-style'):
+                soup.find('div', class_='io-style').extract()
 
             test_samples = soup.find_all('pre')
             # 日本語と英語のテストケースがあるため半分にする
