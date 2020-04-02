@@ -19,7 +19,7 @@ class Judge:
             atcoder_dir_path = config.ATCODER_DIR_PATH
         else:
             atcoder_dir_path = './'
-        target_contest = self.atcoder_dir_path + contest_type + '/' + contest_id
+        target_contest = atcoder_dir_path + contest_type + '/' + contest_id
         self.test_target = target_contest + '/' + prob_type + '.py'
         self.tests_dir   = target_contest + '/tests/' + prob_type + '/'
 
