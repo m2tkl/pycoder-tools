@@ -3,13 +3,22 @@ import subprocess
 import config
 from utils.pycolor import PyColor
 from argparse import ArgumentParser
+from bs4 import BeautifulSoup
+import requests
+
+PYTHON_ID = 3023
+PYPY_ID = 3510
 
 if __name__ == '__main__':
     example = """
     ex1: abc134のd問題をテスト
         python {0} abc 134 d
     ex2: abc142のa問題をテスト（差が1e-6以内かどうか）
-        python {0} abc 142 a -d 1e-6
+        python {0} abc 142 a -d 1e-6e
+    ex3: abc142のa問題がテスト通過したら提出（python3）
+        python {0} abc 142 a -s p
+    ex4: abc142のa問題がテスト通過したら提出（pypy3）
+        python {0} abc 142 a -s pp
     """.format(__file__)
 
     argparser = ArgumentParser(usage=example)
@@ -28,6 +37,10 @@ if __name__ == '__main__':
     argparser.add_argument('-d', '--diff',
                            type=float,
                            help='出力誤差の値を判定')
+    argparser.add_argument('-s', '--submit',
+                           type=str,
+                           choices=['p', 'pp'],
+                           help='テストに全て通過した場合に提出する')
 
     args = argparser.parse_args()
 
@@ -102,3 +115,54 @@ if __name__ == '__main__':
             pc.pprint('{}'.format(expected), color='g')
             pc.pprint('[actual]', color='r')
             pc.pprint('{}'.format(actual), color='r')
+
+    # is_correct = True かつ submitオプションがある場合
+    if is_correct and args.submit:
+        if args.submit == 'p':
+            submit_lang_id = PYTHON_ID
+        else:
+            submit_lang_id = PYPY_ID
+
+        source_path = test_target
+        with open(source_path, 'r') as f:
+            source_code = f.read()
+
+        LOGIN_URL = "https://atcoder.jp/login"
+        # セッション開始
+        session = requests.session()
+        # csrf_token取得
+        r = session.get(LOGIN_URL)
+        s = BeautifulSoup(r.text, 'lxml')
+        csrf_token = s.find(attrs={'name': 'csrf_token'}).get('value')
+        # パラメータセット
+        login_info = {
+            "csrf_token": csrf_token,
+            "username": config.USERNAME,
+            "password": config.PASSWORD
+        }
+        result = session.post(LOGIN_URL, data=login_info)
+        result.raise_for_status()
+        if result.status_code==200:
+            print("Login!")
+        else:
+            print("Failed...")
+            exit(1)
+
+        submit_url = 'https://atcoder.jp/contests/' + contest_type + contest_id + '/submit'
+        html = session.get(submit_url)
+        html.raise_for_status()
+        soup = BeautifulSoup(html.text, 'lxml')
+        csrf_token = soup.find(attrs={'name': 'csrf_token'}).get('value')
+        submit_info = {
+            "data.TaskScreenName": contest_type + contest_id + '_' + problem_type,
+            "csrf_token": csrf_token,
+            "data.LanguageId": submit_lang_id,
+            "sourceCode": source_code
+        }
+        result = session.post(submit_url, data=submit_info)
+        result.raise_for_status()
+
+        if result.status_code == 200:
+            print("Submitted!")
+        else:
+            print("Error in submitting...")
