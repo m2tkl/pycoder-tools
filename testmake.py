@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import config
+from utils.login import AtConnector
 import sys, os
 from argparse import ArgumentParser
 
@@ -14,36 +15,20 @@ class TestMaker():
             self.atcoder_dir_path = './'
 
     def fetch_sample_cases(self):
+        ac = AtConnector()
+        ac.login()
         problems = ['a', 'b', 'c', 'd', 'e', 'f']
-        LOGIN_URL = "https://atcoder.jp/login"
-        # セッション開始
-        session = requests.session()
-        # csrf_token取得
-        r = session.get(LOGIN_URL)
-        s = BeautifulSoup(r.text, 'lxml')
-        csrf_token = s.find(attrs={'name': 'csrf_token'}).get('value')
-        # パラメータセット
-        login_info = {
-            "csrf_token": csrf_token,
-            "username": config.USERNAME,
-            "password": config.PASSWORD
-        }
-        result = session.post(LOGIN_URL, data=login_info)
-        result.raise_for_status()
-        if result.status_code==200:
-            print("Log in!")
-        else:
-            print("Failed...")
-
         for p in problems:
             print('*', end='')
             # url = 'https://atcoder.jp/contests/abc146/tasks/abc146_a'
-            url = 'https://atcoder.jp/contests/' + \
-                self.contest_type + self.contest_id + \
-                '/tasks/abc' + self.contest_id + '_' + p
+            url = \
+                'https://atcoder.jp/contests/' \
+                + self.contest_type + self.contest_id \
+                + '/tasks/abc' + self.contest_id \
+                + '_' + p
             # スクレイピング対象の URL にリクエストを送り HTML を取得する
-            res = requests.get(url)
-
+            # requests.get(~)になっていたため、ログインセッションが有効でなかった可能性あり
+            res = ac.session.get(url)
             # レスポンスの HTML から BeautifulSoup オブジェクトを作る
             soup = BeautifulSoup(res.text, 'html.parser')
             # 入力形式の欄をテストケースとして取得しないように削除
