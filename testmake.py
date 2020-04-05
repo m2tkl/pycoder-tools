@@ -24,21 +24,13 @@ class TestMaker():
             url = \
                 'https://atcoder.jp/contests/' \
                 + self.contest_type + self.contest_id \
-                + '/tasks/abc' + self.contest_id \
+                + '/tasks/'+ self.contest_type + self.contest_id \
                 + '_' + p
-            # スクレイピング対象の URL にリクエストを送り HTML を取得する
-            # requests.get(~)になっていたため、ログインセッションが有効でなかった可能性あり
+            # login済みのセッションを利用して、HTMLを取得する
             res = ac.session.get(url)
             # レスポンスの HTML から BeautifulSoup オブジェクトを作る
             soup = BeautifulSoup(res.text, 'html.parser')
             # 入力形式の欄をテストケースとして取得しないように削除
-            # 2回やるのは日本語用と英語用の両方を削除するため
-            """
-            TODO: コンテスト中にエラーが発生するため修正が必要
-                - [] そもそも取得できているのかどうかを調査
-                - [x] 日本語，英語両方でなく日本語のみで一回だけextractすれば良いのか調査
-                    => io-styleの要素が1回しか出現しないページがあることが判明
-            """
             while soup.find('div', class_='io-style'):
                 soup.find('div', class_='io-style').extract()
 
@@ -53,7 +45,7 @@ class TestMaker():
                 count += 1
 
             for k, v in test_case.items():
-                file_dir = self.atcoder_dir_path + 'ABC/' + self.contest_id + '/tests/'+ p.upper() + '/'
+                file_dir = self.atcoder_dir_path + self.contest_type.upper() + '/' + self.contest_id + '/tests/'+ p.upper() + '/'
                 iname = '0' + str(k) + '_input.txt'
                 oname = '0' + str(k) + '_output.txt'
                 with open(file_dir + iname, 'w') as f:
@@ -78,7 +70,7 @@ class TestMaker():
             s = sys.stdin.readline()
         file_dir = \
             self.atcoder_dir_path + \
-            'ABC/' + self.contest_id + \
+            self.contest_type.upper() + '/' + self.contest_id + \
             '/tests/' + problem_type.upper() + '/'
         tests = os.listdir(file_dir)
         additional_cases = [t for t in tests if t[0] == '1']

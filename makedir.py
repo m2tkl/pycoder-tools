@@ -27,28 +27,21 @@ if __name__ == '__main__':
     else:
         atcoder_dir_path = './'
 
-    if contest_type == 'abc':
-        dir_name = atcoder_dir_path + 'ABC/'+ contest_id + '/'
-        file_names = ['A', 'B', 'C', 'D', 'E', 'F']
-        if not os.path.exists(dir_name):
-            os.mkdir(dir_name)
-        else:
-            print('prog directory already exists')
-        # プログラムファイル作成。テンプレートをコピー。
-        for fn in file_names:
-            if not os.path.exists(dir_name + fn + '.py'):
-                shutil.copy('./template/template.py', dir_name + fn + '.py')
-        # テスト用のディレクトリを作成
-        test_dir_name = atcoder_dir_path + 'ABC/' + contest_id + '/tests/'
-        if not os.path.exists(test_dir_name):
-            for fn in file_names:
-                os.makedirs(test_dir_name + fn)
-        else:
-            print('test directory alread exists')
-    elif contest_type == 'arc':
-        print('Not implemented yet')
-    elif contest_type == 'agc':
-        print('Not implemented yet')
+    dir_name = atcoder_dir_path + contest_type.upper() + '/' + contest_id + '/'
+    file_names = ['A', 'B', 'C', 'D', 'E', 'F']
+    if not os.path.exists(dir_name):
+        os.mkdir(dir_name)
     else:
-        print('contest name is not a valid...')
-        exit(1)
+        print('prog directory already exists')
+    # プログラムファイル作成。テンプレートをコピー。
+    for fn in file_names:
+        if not os.path.exists(dir_name + fn + '.py'):
+            shutil.copy('./template/template.py', dir_name + fn + '.py')
+    # テスト用のディレクトリを作成
+    test_dir_name = atcoder_dir_path + contest_type.upper() + '/' + contest_id + '/tests/'
+    if not os.path.exists(test_dir_name):
+        for fn in file_names:
+            os.makedirs(test_dir_name + fn)
+    else:
+        print('test directory alread exists')
+
