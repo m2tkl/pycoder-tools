@@ -14,6 +14,15 @@ class TestMaker():
         else:
             self.atcoder_dir_path = './'
 
+    def __extract_unused_data(self, soup_obj):
+        # 英語ケースを削除
+        while soup_obj.find('span', class_='lang-en'):
+            soup_obj.find('span', class_='lang-en').extract()
+        # 入力形式の欄をテストケースとして取得しないように削除
+        while soup_obj.find('div', class_='io-style'):
+            soup_obj.find('div', class_='io-style').extract()
+        return soup_obj
+
     def fetch_sample_cases(self):
         ac = AtConnector()
         ac.login()
@@ -30,13 +39,9 @@ class TestMaker():
             res = ac.session.get(url)
             # レスポンスの HTML から BeautifulSoup オブジェクトを作る
             soup = BeautifulSoup(res.text, 'html.parser')
-            # 入力形式の欄をテストケースとして取得しないように削除
-            while soup.find('div', class_='io-style'):
-                soup.find('div', class_='io-style').extract()
 
+            soup = self.__extract_unused_data(soup)
             test_samples = soup.find_all('pre')
-            # 日本語と英語のテストケースがあるため半分にする
-            test_samples = test_samples[0:len(test_samples)//2]
             test_case = {}
             count = 0
             for i in range(0, len(test_samples), 2):
@@ -44,14 +49,15 @@ class TestMaker():
                                     test_samples[i+1].get_text())
                 count += 1
 
+            # サンプルケースをファイルへ書き込む
+            file_dir = \
+                self.atcoder_dir_path + self.contest_type.upper() \
+                + '/' + self.contest_id + '/tests/'+ p.upper() + '/'
             for k, v in test_case.items():
-                file_dir = self.atcoder_dir_path + self.contest_type.upper() + '/' + self.contest_id + '/tests/'+ p.upper() + '/'
                 iname = '0' + str(k) + '_input.txt'
                 oname = '0' + str(k) + '_output.txt'
-                with open(file_dir + iname, 'w') as f:
-                    f.write(v[0])
-                with open(file_dir + oname, 'w') as f:
-                    f.write(v[1])
+                with open(file_dir + iname, 'w') as f: f.write(v[0])
+                with open(file_dir + oname, 'w') as f: f.write(v[1])
 
         print('\nDone!')
 
@@ -75,12 +81,9 @@ class TestMaker():
         tests = os.listdir(file_dir)
         additional_cases = [t for t in tests if t[0] == '1']
         prefix = str(10 + len(additional_cases)//2)
-        with open(file_dir + prefix + '_input.txt', 'w') as f:
-            f.write(input_case.rstrip())
-        with open(file_dir + prefix + '_output.txt', 'w') as f:
-            f.write(output_case)
+        with open(file_dir + prefix + '_input.txt', 'w') as f: f.write(input_case.rstrip())
+        with open(file_dir + prefix + '_output.txt', 'w') as f: f.write(output_case)
         print('Done!')
-
 
 if __name__ == '__main__':
 
