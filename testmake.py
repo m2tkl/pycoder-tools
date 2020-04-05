@@ -14,6 +14,15 @@ class TestMaker():
         else:
             self.atcoder_dir_path = './'
 
+    def __extract_unused_data(self, soup_obj):
+        # 英語ケースを削除
+        while soup_obj.find('span', class_='lang-en'):
+            soup_obj.find('span', class_='lang-en').extract()
+        # 入力形式の欄をテストケースとして取得しないように削除
+        while soup_obj.find('div', class_='io-style'):
+            soup_obj.find('div', class_='io-style').extract()
+        return soup_obj
+
     def fetch_sample_cases(self):
         ac = AtConnector()
         ac.login()
@@ -30,13 +39,9 @@ class TestMaker():
             res = ac.session.get(url)
             # レスポンスの HTML から BeautifulSoup オブジェクトを作る
             soup = BeautifulSoup(res.text, 'html.parser')
-            # 入力形式の欄をテストケースとして取得しないように削除
-            while soup.find('div', class_='io-style'):
-                soup.find('div', class_='io-style').extract()
 
+            soup = self.__extract_unused_data(soup)
             test_samples = soup.find_all('pre')
-            # 日本語と英語のテストケースがあるため半分にする
-            test_samples = test_samples[0:len(test_samples)//2]
             test_case = {}
             count = 0
             for i in range(0, len(test_samples), 2):
