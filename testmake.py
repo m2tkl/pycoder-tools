@@ -44,14 +44,15 @@ class TestMaker():
                                     test_samples[i+1].get_text())
                 count += 1
 
+            # サンプルケースをファイルへ書き込む
+            file_dir = \
+                self.atcoder_dir_path + self.contest_type.upper() \
+                + '/' + self.contest_id + '/tests/'+ p.upper() + '/'
             for k, v in test_case.items():
-                file_dir = self.atcoder_dir_path + self.contest_type.upper() + '/' + self.contest_id + '/tests/'+ p.upper() + '/'
                 iname = '0' + str(k) + '_input.txt'
                 oname = '0' + str(k) + '_output.txt'
-                with open(file_dir + iname, 'w') as f:
-                    f.write(v[0])
-                with open(file_dir + oname, 'w') as f:
-                    f.write(v[1])
+                with open(file_dir + iname, 'w') as f: f.write(v[0])
+                with open(file_dir + oname, 'w') as f: f.write(v[1])
 
         print('\nDone!')
 
@@ -75,12 +76,9 @@ class TestMaker():
         tests = os.listdir(file_dir)
         additional_cases = [t for t in tests if t[0] == '1']
         prefix = str(10 + len(additional_cases)//2)
-        with open(file_dir + prefix + '_input.txt', 'w') as f:
-            f.write(input_case.rstrip())
-        with open(file_dir + prefix + '_output.txt', 'w') as f:
-            f.write(output_case)
+        with open(file_dir + prefix + '_input.txt', 'w') as f: f.write(input_case.rstrip())
+        with open(file_dir + prefix + '_output.txt', 'w') as f: f.write(output_case)
         print('Done!')
-
 
 if __name__ == '__main__':
 
