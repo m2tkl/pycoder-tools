@@ -32,7 +32,7 @@ pythonでatcoderやるときに便利なスクリプトを勉強も兼ねて作�
 ## 準備
 
 ### 外部ライブラリのインストール
-`beautifulsoup4`、`requests`のインストールをお願いします。
+`beautifulsoup4`、`requests`、`html5lib`のインストールをお願いします。
 
 ### 設定ファイルの作成
 `pycoder-tools`ディレクトリ直下に`config.py`というファイルを作成します。
