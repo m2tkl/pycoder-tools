@@ -38,8 +38,7 @@ class TestMaker():
             # login済みのセッションを利用して、HTMLを取得する
             res = ac.session.get(url)
             # レスポンスの HTML から BeautifulSoup オブジェクトを作る
-            soup = BeautifulSoup(res.text, 'html.parser')
-
+            soup = BeautifulSoup(res.text, 'html5lib')
             soup = self.__extract_unused_data(soup)
             test_samples = soup.find_all('pre')
             test_case = {}
@@ -48,7 +47,6 @@ class TestMaker():
                 test_case[count] = (test_samples[i].get_text(),
                                     test_samples[i+1].get_text())
                 count += 1
-
             # サンプルケースをファイルへ書き込む
             file_dir = \
                 self.atcoder_dir_path + self.contest_type.upper() \
