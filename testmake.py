@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import config
 from libpycoder.login import AtConnector
+from libpycoder.pathmanager import PathManager
 import sys, os
 from argparse import ArgumentParser
 
@@ -9,10 +10,7 @@ class TestMaker():
     def __init__(self, contest_type, contest_id):
         self.contest_type = contest_type
         self.contest_id = contest_id
-        if not config.ATCODER_DIR_PATH == None:
-            self.atcoder_dir_path = config.ATCODER_DIR_PATH
-        else:
-            self.atcoder_dir_path = './'
+        self.pm = PathManager(contest_type, contest_id)
 
     def __extract_unused_data(self, soup_obj):
         # 英語ケースを削除
@@ -29,12 +27,7 @@ class TestMaker():
         problems = ['a', 'b', 'c', 'd', 'e', 'f']
         for p in problems:
             print('*', end='')
-            # url = 'https://atcoder.jp/contests/abc146/tasks/abc146_a'
-            url = \
-                'https://atcoder.jp/contests/' \
-                + self.contest_type + self.contest_id \
-                + '/tasks/'+ self.contest_type + self.contest_id \
-                + '_' + p
+            url = self.pm.get_prob_url(p)
             # login済みのセッションを利用して、HTMLを取得する
             res = ac.session.get(url)
             # レスポンスの HTML から BeautifulSoup オブジェクトを作る
@@ -48,9 +41,7 @@ class TestMaker():
                                     test_samples[i+1].get_text())
                 count += 1
             # サンプルケースをファイルへ書き込む
-            file_dir = \
-                self.atcoder_dir_path + self.contest_type.upper() \
-                + '/' + self.contest_id + '/tests/'+ p.upper() + '/'
+            file_dir = self.pm.get_tests_dir_path(p)
             for k, v in test_case.items():
                 iname = '0' + str(k) + '_input.txt'
                 oname = '0' + str(k) + '_output.txt'
@@ -72,10 +63,7 @@ class TestMaker():
         while not s == '\n':
             output_case += s
             s = sys.stdin.readline()
-        file_dir = \
-            self.atcoder_dir_path + \
-            self.contest_type.upper() + '/' + self.contest_id + \
-            '/tests/' + problem_type.upper() + '/'
+        file_dir = self.pm.get_tests_dir_path(problem_type)
         tests = os.listdir(file_dir)
         additional_cases = [t for t in tests if t[0] == '1']
         prefix = str(10 + len(additional_cases)//2)
