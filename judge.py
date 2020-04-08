@@ -2,7 +2,8 @@ import sys, os
 import subprocess
 import config
 from utils.pycolor import PyColor
-from utils.login import AtConnector
+from libpycoder.login import AtConnector
+from libpycoder.pathmanager import PathManager
 from argparse import ArgumentParser
 from bs4 import BeautifulSoup
 import requests
@@ -12,16 +13,11 @@ PYPY_ID = 3510
 
 class Judge:
     def __init__(self, contest_type, contest_id, prob_type):
-        self.contest_type = contest_type
-        self.contest_id = contest_id
-        self.prob_type = prob_type
-        if not config.ATCODER_DIR_PATH == None:
-            atcoder_dir_path = config.ATCODER_DIR_PATH
-        else:
-            atcoder_dir_path = './'
-        target_contest = atcoder_dir_path + contest_type + '/' + contest_id
-        self.test_target = target_contest + '/' + prob_type + '.py'
-        self.tests_dir   = target_contest + '/tests/' + prob_type + '/'
+        self.pm = PathManager(contest_type, contest_id)
+        self.test_target = self.pm.get_prob_file_path(prob_type)
+        self.tests_dir = self.pm.get_tests_dir_path(prob_type)
+
+        self.task_screen_name = contest_type + contest_id + '_' + prob_type
 
         test_files = sorted(os.listdir(self.tests_dir))
         self.test_cases = []
@@ -43,7 +39,7 @@ class Judge:
             else:
                 pc.pprint('additional_case' + prefix + ' => ', end='', bold=True)
             # テスト実行
-            # ex: python <atcoder-dir-path>/abc/134/a.py < <atcoder-dir-path>/abc/134/tests/A/00_input.txt
+            # ex: python <atcoder-dir-path>/ABC/134/A.py < <atcoder-dir-path>/abc/134/tests/A/00_input.txt
             command = ['python', self.test_target, '<', self.tests_dir + test_input]
             std = subprocess.run(' '.join(command), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
 
@@ -82,17 +78,13 @@ class Judge:
         ac.login()
         with open(self.test_target, 'r') as f:
             submit_code = f.read()
-        submit_url = \
-            'https://atcoder.jp/contests/' \
-            + self.contest_type + self.contest_id \
-            + '/submit'
+        submit_url = self.pm.get_submit_url()
         html = ac.session.get(submit_url)
         html.raise_for_status()
         soup = BeautifulSoup(html.text, 'lxml')
         csrf_token = soup.find(attrs={'name': 'csrf_token'}).get('value')
-        task_screen_name = self.contest_type + self.contest_id + '_' + self.prob_type
         submit_info = {
-            "data.TaskScreenName": task_screen_name,
+            "data.TaskScreenName": self.task_screen_name,
             "csrf_token": csrf_token,
             "data.LanguageId": submit_lang_id,
             "sourceCode": submit_code
@@ -149,6 +141,9 @@ if __name__ == '__main__':
     if result and args.submit:
         if args.submit == 'p':
             submit_lang_id = PYTHON_ID
-        else:
+        elif args.submit == 'pp':
             submit_lang_id = PYPY_ID
+        else:
+            print('This option not supported.')
+            exit(1)
         judge.submit(submit_lang_id)

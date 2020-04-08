@@ -2,6 +2,7 @@ import sys, os
 import shutil
 import config
 from argparse import ArgumentParser
+from libpycoder.pathmanager import PathManager
 
 if __name__ == '__main__':
     example = """
@@ -22,12 +23,8 @@ if __name__ == '__main__':
     contest_type = args.contest_type
     contest_id = args.contest_id
 
-    if not config.ATCODER_DIR_PATH == None:
-        atcoder_dir_path = config.ATCODER_DIR_PATH
-    else:
-        atcoder_dir_path = './'
-
-    dir_name = atcoder_dir_path + contest_type.upper() + '/' + contest_id + '/'
+    pm = PathManager(contest_type, contest_id)
+    dir_name = pm.ATCODER_DIR
     file_names = ['A', 'B', 'C', 'D', 'E', 'F']
     if not os.path.exists(dir_name):
         os.mkdir(dir_name)
@@ -38,7 +35,7 @@ if __name__ == '__main__':
         if not os.path.exists(dir_name + fn + '.py'):
             shutil.copy('./template/template.py', dir_name + fn + '.py')
     # テスト用のディレクトリを作成
-    test_dir_name = atcoder_dir_path + contest_type.upper() + '/' + contest_id + '/tests/'
+    test_dir_name = pm.ATCODER_DIR + 'tests/'
     if not os.path.exists(test_dir_name):
         for fn in file_names:
             os.makedirs(test_dir_name + fn)
