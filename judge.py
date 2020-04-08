@@ -1,13 +1,5 @@
-import sys, os
-import subprocess
-import config
-from utils.pycolor import PyColor
-from libpycoder.login import AtConnector
-from libpycoder.pathmanager import PathManager
 from libpycoder.judge import Judge
 from argparse import ArgumentParser
-from bs4 import BeautifulSoup
-import requests
 
 PYTHON_ID = 3023
 PYPY_ID = 3510
