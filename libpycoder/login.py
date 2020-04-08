@@ -9,7 +9,7 @@ LOGIN_URL = 'https://atcoder.jp/login'
 USERNAME = config.USERNAME
 PASSWORD = config.PASSWORD
 
-class AtConnector():
+class AtConnector:
     def __init__(self):
         self.session = None
 
