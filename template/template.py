@@ -1,6 +1,7 @@
 import sys
-input = lambda: sys.stdin.readline().rstrip()
-input_nums = lambda: list(map(int, input().split()))
+IS = lambda: sys.stdin.readline().rstrip()
+II = lambda: int(IS())
+MII = lambda: list(map(int, IS().split()))
 
 def main():
     
