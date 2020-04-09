@@ -3,7 +3,7 @@ import subprocess
 import config
 from .login import AtConnector
 from .pathmanager import PathManager
-from utils.pycolor import PyColor
+from utils.pycolor import pprint
 from bs4 import BeautifulSoup
 import requests
 
@@ -22,52 +22,66 @@ class Judge:
             test_case = (test_files[i], test_files[i+1])
             self.test_cases.append(test_case)
 
-    def test(self, diff=None, verbose=False):
-        pc = PyColor()
+    def test(self, diff=None, verbose=False) -> bool:
         print('test num: {}'.format(len(self.test_cases)))
         for test in self.test_cases:
             test_input = test[0]
             test_output = test[1]
             prefix = test_input[:2]
-            # prefixの２桁目が0の場合はsampleテストケース,1の場合は追加したテストケースを表す
+            # prefixの２桁目が0の場合はsampleテストケース,それ以外の場合は追加したテストケースを表す
             if prefix[0] == '0':
-                pc.pprint('sample_case' + prefix + ' => ', end='', bold=True)
+                pprint('sample_case' + prefix + ' => ', end='', bold=True)
             else:
-                pc.pprint('additional_case' + prefix + ' => ', end='', bold=True)
-            # テスト実行
-            # ex: python <atcoder-dir-path>/ABC/134/A.py < <atcoder-dir-path>/abc/134/tests/A/00_input.txt
-            command = ['python', self.test_target, '<', self.tests_dir + test_input]
-            std = subprocess.run(' '.join(command), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+                pprint('additional_case' + prefix + ' => ', end='', bold=True)
+
+            actual = self.run_program(self.test_target, self.tests_dir+test_input)
+            expected = self.get_expected_val(self.tests_dir+test_output)
 
             # Judge!
-            with open(self.tests_dir + test_output) as f:
-                expected = f.read().rstrip()
-                actual = std.stdout.decode('utf-8').rstrip()
-                # --diffオプションを指定した場合は誤差を判定する
-                if diff:
-                    is_correct = (abs(float(expected) - float(actual)) < args.diff)
-                else:
-                    is_correct = (expected == actual)
+            # --diffオプションを指定した場合は誤差を判定する
+            if diff: result = self.judge_diff(actual, expected, diff)
+            else:    result = self.judge_equal(actual, expected)
+
+            with open(self.tests_dir + test_input) as f: input_val = f.read().rstrip()
+
+            # Show results
+            self.print_result(result, input_val, actual, expected, verbose)
+        return result
+
+    def run_program(self, target: str, target_input:str) -> str:
+        # ex: python <atcoder-dir-path>/ABC/134/A.py < <atcoder-dir-path>/ABC/134/tests/A/00_input.txt
+        command = ['python', target, '<', target_input]
+        std = subprocess.run(' '.join(command), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+        res = std.stdout.decode('utf-8').rstrip()
+        return res
+
+    def get_expected_val(self, file_name: str) -> str:
+        with open(file_name, 'r') as f: expected = f.read().rstrip()
+        return expected
+
+    def judge_equal(self, actual:str, expected:str) -> bool:
+        return actual == expected
+
+    def judge_diff(self, actual: str, expected: str, diff: float):
+       return abs(float(expected) - float(actual)) < diff
+
+    def print_result(self, result: bool, input_val, actual, expected, verbose: bool = None):
+        if result:
+            pprint('OK', color='green')
             if verbose:
-                with open(self.tests_dir + test_input) as f:
-                    input_val = f.read().rstrip()
-            if is_correct:
-                pc.pprint('OK', color='green')
-                if verbose:
-                    print('[input]')
-                    print('{}'.format(input_val))
-                    print('[output]')
-                    print('{}'.format(actual))
-            else:
-                pc.pprint('NG', color='r')
-                if verbose:
-                    print('[input]')
-                    print('{}'.format(input_val))
-                pc.pprint('[expected]', color='g')
-                pc.pprint('{}'.format(expected), color='g')
-                pc.pprint('[actual]', color='r')
-                pc.pprint('{}'.format(actual), color='r')
-        return is_correct
+                print('[input]')
+                print('{}'.format(input_val))
+                print('[output]')
+                print('{}'.format(actual))
+        else:
+            pprint('NG', color='r')
+            if verbose:
+                print('[input]')
+                print('{}'.format(input_val))
+            pprint('[expected]', color='g')
+            pprint('{}'.format(expected), color='g')
+            pprint('[actual]', color='r')
+            pprint('{}'.format(actual), color='r')
 
     def submit(self, submit_lang_id):
         ac = AtConnector()
