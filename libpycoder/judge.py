@@ -24,6 +24,7 @@ class Judge:
 
     def test(self, diff=None, verbose=False) -> bool:
         print('test num: {}'.format(len(self.test_cases)))
+        all_result = True
         for test in self.test_cases:
             test_input = test[0]
             test_output = test[1]
@@ -41,12 +42,13 @@ class Judge:
             # --diffオプションを指定した場合は誤差を判定する
             if diff: result = self.judge_diff(actual, expected, diff)
             else:    result = self.judge_equal(actual, expected)
+            all_result &= result
 
             with open(self.tests_dir + test_input) as f: input_val = f.read().rstrip()
 
             # Show results
             self.print_result(result, input_val, actual, expected, verbose)
-        return result
+        return all_result
 
     def run_program(self, target: str, target_input:str) -> str:
         # ex: python <atcoder-dir-path>/ABC/134/A.py < <atcoder-dir-path>/ABC/134/tests/A/00_input.txt

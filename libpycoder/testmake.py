@@ -10,6 +10,8 @@ class TestMaker():
         self.contest_type = contest_type
         self.contest_id = contest_id
         self.pm = PathManager(contest_type, contest_id)
+        self.ac = AtConnector()
+        self.ac.login()
 
     def __extract_unused_data(self, soup_obj):
         # 英語ケースを削除
@@ -21,14 +23,14 @@ class TestMaker():
         return soup_obj
 
     def fetch_sample_cases(self):
-        ac = AtConnector()
-        ac.login()
         problems = ['a', 'b', 'c', 'd', 'e', 'f']
+        prob_urls = self.get_prob_urls_from_contest_page()
         for p in problems:
             print('*', end='')
-            url = self.pm.get_prob_url(p)
+            url = prob_urls[p]
+            if url == '': continue
             # login済みのセッションを利用して、HTMLを取得する
-            res = ac.session.get(url)
+            res = self.ac.session.get(url)
             # レスポンスの HTML から BeautifulSoup オブジェクトを作る
             soup = BeautifulSoup(res.text, 'html5lib')
             soup = self.__extract_unused_data(soup)
@@ -46,8 +48,26 @@ class TestMaker():
                 oname = '0' + str(k) + '_output.txt'
                 with open(file_dir + iname, 'w') as f: f.write(v[0])
                 with open(file_dir + oname, 'w') as f: f.write(v[1])
-
         print('\nDone!')
+
+    def get_prob_urls_from_contest_page(self):
+        """コンテスト問題一覧ページから各問題のurlを取得して返す
+        Args:
+        Returns:
+            urls: 各問題のurl
+        """
+        contest_url = self.pm.get_contest_url()
+        res = self.ac.session.get(contest_url)
+        soup = BeautifulSoup(res.text, 'html5lib')
+
+        urls = {'a': '', 'b': '', 'c': '', 'd': '', 'e': '', 'f': ''}
+        for tbody in soup.find_all('tbody'):
+            for tr in tbody.find_all('tr'):
+                item = tr.find('td').find('a')
+                prob_type = item.contents[0].lower()
+                url = item.get('href')
+                urls[prob_type] = 'https://atcoder.jp' + url
+        return urls
 
     def add_test_case(self, problem_type):
         print('Input:')

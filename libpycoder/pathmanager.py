@@ -28,11 +28,30 @@ class PathManager:
         PathManager.ATCODER_DIR = res
 
     def get_prob_url(self, prob_type):
+        """指定した問題のurlを返す
+        !! 注意 !!
+        コンテストの種類、番号、問題のタイプが必ずしも一致しないため、
+        get_contest_urlの使用して正しいurlを取得することを推奨
+        Args:
+            prob_type: 問題の種類(a, b, c, ...)
+        Returns:
+            prob_url: 指定した問題のurl
+        """
         prob_url = \
             PathManager.CONTEST_URL + self.contest_type + self.contest_id \
             + '/tasks/' \
             + self.contest_type + self.contest_id + '_' + prob_type
         return prob_url
+
+    def get_contest_url(self) -> str:
+        """contest問題一覧ページのurlを返す
+        Args:
+        Returns:
+            contest_url: コンテストの問題一覧ページのurl
+        """
+        contest_url = \
+            PathManager.CONTEST_URL + self.contest_type + self.contest_id + '/tasks'
+        return contest_url
 
     def get_submit_url(self):
         return PathManager.SUBMIT_URL
