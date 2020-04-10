@@ -46,8 +46,24 @@ class TestMaker():
                 oname = '0' + str(k) + '_output.txt'
                 with open(file_dir + iname, 'w') as f: f.write(v[0])
                 with open(file_dir + oname, 'w') as f: f.write(v[1])
-
         print('\nDone!')
+
+    def get_prob_urls_from_contest_page(self) -> List[str]:
+        ac = AtConnector()
+        ac.login
+        contest_url = self.pm.get_contest_url()
+        res = ac.session.get(contest_url)
+        soup = BeautifulSoup(res.txt, 'html5lib')
+
+        urls = {'a': '', 'b': '', 'c': '', 'd': '', 'e': '', 'f': ''}
+        for tbody in soup.find_all('tbody'):
+            for tr in tbody.find_all('tr'):
+                item = tr.find('td').find('a')
+                prob_type = item.contents[0].lower()
+                url = item.get('href')
+                urls[prob_type] = 'https://atcoder.jp' + url
+        return urls
+
 
     def add_test_case(self, problem_type):
         print('Input:')
