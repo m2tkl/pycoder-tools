@@ -87,37 +87,23 @@ class Judge:
     def submit(self, submit_lang_id):
         ac = AtConnector()
         ac.login()
+        submit_url = self.pm.get_submit_url()
+        csrf_token = ac.get_csrf_token(submit_url)
+
+        contest_url = self.pm.get_contest_url()
+        task_screen_name = ac.get_task_screen_name(contest_url, self.prob_type)
+
         with open(self.test_target, 'r') as f:
             submit_code = f.read()
-        submit_url = self.pm.get_submit_url()
-        html = ac.session.get(submit_url)
-        html.raise_for_status()
-        soup = BeautifulSoup(html.text, 'lxml')
-        csrf_token = soup.find(attrs={'name': 'csrf_token'}).get('value')
-
-        task_screen_name = ''
-        contest_url = self.pm.get_contest_url()
-        res = ac.session.get(contest_url)
-        soup = BeautifulSoup(res.text, 'html5lib')
-        for tr in soup.find('tbody').find_all('tr'):
-            item = tr.find('td').find('a')
-            prob_type = item.contents[0].lower()
-            url = item.get('href')
-            if prob_type == self.prob_type:
-                # /contests/abc160/tasks/abc160_a という形式で取得できるので、
-                # 最後の'abc160_a'の部分を取り出す
-                task_screen_name = item.get('href').split('/')[-1]
-                break
-
         submit_info = {
             "data.TaskScreenName": task_screen_name,
             "csrf_token": csrf_token,
             "data.LanguageId": submit_lang_id,
             "sourceCode": submit_code
         }
-        result = ac.session.post(submit_url, data=submit_info)
-        result.raise_for_status()
-        if result.status_code == 200:
+        res = ac.post(submit_url, data=submit_info)
+        res.raise_for_status()
+        if res.status_code == 200:
             print("Submitted!")
         else:
             print("Error in submitting...")
