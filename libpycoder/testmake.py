@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import config
-from .login import AtConnector
+from .atconnector import AtConnector
 from .pathmanager import PathManager
 import sys, os
 

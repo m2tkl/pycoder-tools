@@ -1,7 +1,7 @@
 import os
 import subprocess
 import config
-from .login import AtConnector
+from .atconnector import AtConnector
 from .pathmanager import PathManager
 from utils.pycolor import pprint
 from bs4 import BeautifulSoup
@@ -12,6 +12,8 @@ class Judge:
         self.pm = PathManager(contest_type, contest_id)
         self.test_target = self.pm.get_prob_file_path(prob_type)
         self.tests_dir = self.pm.get_tests_dir_path(prob_type)
+        self.contest_type = contest_type
+        self.contest_id = contest_id
         self.prob_type = prob_type
 
         test_files = sorted(os.listdir(self.tests_dir))
@@ -90,17 +92,18 @@ class Judge:
         submit_url = self.pm.get_submit_url()
         csrf_token = ac.get_csrf_token(submit_url)
 
-        contest_url = self.pm.get_contest_url()
-        task_screen_name = ac.get_task_screen_name(contest_url, self.prob_type)
+        task_screen_name = ac.get_task_screen_name(self.contest_type,
+                                                   self.contest_id,
+                                                   self.prob_type)
 
         with open(self.test_target, 'r') as f:
             submit_code = f.read()
-        submit_info = {
-            "data.TaskScreenName": task_screen_name,
-            "csrf_token": csrf_token,
-            "data.LanguageId": submit_lang_id,
-            "sourceCode": submit_code
-        }
+
+        submit_info = {"data.TaskScreenName": task_screen_name,
+                       "csrf_token": csrf_token,
+                       "data.LanguageId": submit_lang_id,
+                       "sourceCode": submit_code}
+
         res = ac.post(submit_url, data=submit_info)
         res.raise_for_status()
         if res.status_code == 200:
