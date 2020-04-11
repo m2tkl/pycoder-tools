@@ -24,7 +24,7 @@ class TestMaker():
 
     def fetch_sample_cases(self):
         problems = ['a', 'b', 'c', 'd', 'e', 'f']
-        prob_urls = self.get_prob_urls_from_contest_page()
+        prob_urls = self.ac.get_prob_urls(self.contest_type, self.contest_id)
         for p in problems:
             print('*', end='')
             url = prob_urls[p]
@@ -49,25 +49,6 @@ class TestMaker():
                 with open(file_dir + iname, 'w') as f: f.write(v[0])
                 with open(file_dir + oname, 'w') as f: f.write(v[1])
         print('\nDone!')
-
-    def get_prob_urls_from_contest_page(self):
-        """コンテスト問題一覧ページから各問題のurlを取得して返す
-        Args:
-        Returns:
-            urls: 各問題のurl
-        """
-        contest_url = self.pm.get_contest_url()
-        res = self.ac.session.get(contest_url)
-        soup = BeautifulSoup(res.text, 'html5lib')
-
-        urls = {'a': '', 'b': '', 'c': '', 'd': '', 'e': '', 'f': ''}
-        for tbody in soup.find_all('tbody'):
-            for tr in tbody.find_all('tr'):
-                item = tr.find('td').find('a')
-                prob_type = item.contents[0].lower()
-                url = item.get('href')
-                urls[prob_type] = 'https://atcoder.jp' + url
-        return urls
 
     def add_test_case(self, problem_type):
         print('Input:')
