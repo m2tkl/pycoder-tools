@@ -44,8 +44,9 @@ class AtConnector:
             exit(1)
 
     def get_csrf_token(self, url):
-        html = self.session.get(url)
-        html.raise_for_status()
+        res = self.session.get(url)
+        res.raise_for_status()
+        html = res.text
         csrf_token = extract_csrf_token(html)
         return csrf_token
 
@@ -77,7 +78,8 @@ class AtConnector:
 
     def _get_contest_tasks_page(self, contest_type, contest_id):
         tasks_url = self._get_tasks_url(contest_type, contest_id)
-        html = self.get(tasks_url)
+        res = self.get(tasks_url)
+        html = res.text
         return html
 
     def _get_tasks_url(self, contest_type, contest_id):

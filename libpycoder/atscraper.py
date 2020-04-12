@@ -1,6 +1,7 @@
+from typing import Dict
 from bs4 import BeautifulSoup as bs
 
-def extract_task_screen_name(html, prob_type):
+def extract_task_screen_name(html: str, prob_type: str) -> str:
     prob_links = extract_prob_links(html)
     task_screen_name = ''
     for p_type, link in prob_links.items():
@@ -11,13 +12,13 @@ def extract_task_screen_name(html, prob_type):
             break
     return task_screen_name
 
-def extract_csrf_token(html):
-    soup = bs(html.text, 'lxml')
+def extract_csrf_token(html: str) -> str:
+    soup = bs(html, 'html5lib')
     csrf_token = soup.find(attrs={'name': 'csrf_token'}).get('value')
     return csrf_token
 
-def extract_prob_links(html):
-    soup = bs(html.text, 'html5lib')
+def extract_prob_links(html: str) -> Dict[str, str]:
+    soup = bs(html, 'html5lib')
     prob_links = {'a': '', 'b': '', 'c': '', 'd': '', 'e': '', 'f': '',}
     for tr in soup.find('tbody').find_all('tr'):
         item = tr.find('td').find('a')

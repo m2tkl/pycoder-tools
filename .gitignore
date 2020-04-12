@@ -1,2 +1,5 @@
 config.py
 *.pyc
+htmlcov
+.coverage
+__pycache__
