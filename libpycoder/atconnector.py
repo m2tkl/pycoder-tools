@@ -44,8 +44,9 @@ class AtConnector:
             exit(1)
 
     def get_csrf_token(self, url):
-        html = self.session.get(url)
-        html.raise_for_status()
+        res = self.session.get(url)
+        res.raise_for_status()
+        html = res.text
         csrf_token = extract_csrf_token(html)
         return csrf_token
 

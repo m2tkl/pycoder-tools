@@ -13,7 +13,7 @@ def extract_task_screen_name(html: str, prob_type: str) -> str:
     return task_screen_name
 
 def extract_csrf_token(html: str) -> str:
-    soup = bs(html, 'lxml')
+    soup = bs(html, 'html5lib')
     csrf_token = soup.find(attrs={'name': 'csrf_token'}).get('value')
     return csrf_token
 
