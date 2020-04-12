@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup as bs
 def extract_task_screen_name(html, prob_type):
     prob_links = extract_prob_links(html)
     task_screen_name = ''
-    for p_type, link in prob_links:
+    for p_type, link in prob_links.items():
         if p_type == prob_type:
             # /contests/abc160/tasks/abc160_a という形式で取得できるので、
             # 最後の'abc160_a'の部分を取り出す
