@@ -88,23 +88,13 @@ class Judge:
 
     def submit(self, submit_lang_id):
         ac = AtConnector()
-        ac.login()
-        submit_url = self.pm.get_submit_url()
-        csrf_token = ac.get_csrf_token(submit_url)
-
-        task_screen_name = ac.get_task_screen_name(self.contest_type,
-                                                   self.contest_id,
-                                                   self.prob_type)
-
         with open(self.test_target, 'r') as f:
             submit_code = f.read()
-
-        submit_info = {"data.TaskScreenName": task_screen_name,
-                       "csrf_token": csrf_token,
-                       "data.LanguageId": submit_lang_id,
-                       "sourceCode": submit_code}
-
-        res = ac.post(submit_url, data=submit_info)
+        res = ac.submit(self.contest_type,
+                  self.contest_id,
+                  self.prob_type,
+                  submit_code,
+                  submit_lang_id)
         res.raise_for_status()
         if res.status_code == 200:
             print("Submitted!")
