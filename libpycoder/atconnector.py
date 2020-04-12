@@ -77,7 +77,8 @@ class AtConnector:
 
     def _get_contest_tasks_page(self, contest_type, contest_id):
         tasks_url = self._get_tasks_url(contest_type, contest_id)
-        html = self.get(tasks_url)
+        res = self.get(tasks_url)
+        html = res.text
         return html
 
     def _get_tasks_url(self, contest_type, contest_id):
