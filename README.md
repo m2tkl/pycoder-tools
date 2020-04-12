@@ -1,5 +1,4 @@
-<img alt="Run pytest" src="https://github.com/kenchalros/pycoder-tools/workflows/Python application/badge.svg"></a>
-# pycoder-tools 
+# pycoder-tools <img alt="Run pytest" src="https://github.com/kenchalros/pycoder-tools/workflows/Python application/badge.svg"></a>
 
 pythonでatcoderやるときに便利なスクリプトです。  
 テストケースのコピペから開放されます。  
