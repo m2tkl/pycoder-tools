@@ -11,6 +11,7 @@ class TestMaker():
         self.contest_id = contest_id
         self.pm = PathManager(contest_type, contest_id)
         self.ac = AtConnector()
+        self.ac.init_session()
 
     def __extract_unused_data(self, soup_obj):
         # 英語ケースを削除

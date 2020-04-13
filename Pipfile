@@ -12,6 +12,8 @@ pytest = "*"
 html5lib = "*"
 pytest-cov = "*"
 lxml = "*"
+typing = "*"
+numpy = "*"
 
 [requires]
 python_version = "3.6"
@@ -22,4 +24,3 @@ python_version = "3.6"
 'judge' = "python judge.py"
 'pycode' = "python pycode.py"
 'addtest' = "python testmake.py"
-

@@ -3,3 +3,4 @@ config.py
 htmlcov
 .coverage
 __pycache__
+.vscode
