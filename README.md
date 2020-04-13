@@ -1,4 +1,7 @@
-# pycoder-tools
+# pycoder-tools <img alt="Run pytest" src="https://github.com/kenchalros/pycoder-tools/workflows/Python application/badge.svg"></a>
+
+pythonでatcoderやるときに便利なスクリプトです。  
+テストケースのコピペから開放されます。  
 
 ## 目次
 
@@ -13,8 +16,6 @@
   - [ソースコード提出](#ソースコード提出)
 
 ## 概要
-pythonでatcoderやるときに便利なスクリプトを勉強も兼ねて作成してみました。  
-テストケースのコピペから開放されます。  
 
 ### できること
 - コンテスト用のディレクトリ、ファイル作成
