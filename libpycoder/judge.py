@@ -86,18 +86,12 @@ class Judge:
             pprint('[actual]', color='r')
             pprint('{}'.format(actual), color='r')
 
-    def submit(self, submit_lang_id):
+    def submit(self, lang_type):
         ac = AtConnector()
         with open(self.test_target, 'r') as f:
             submit_code = f.read()
-        res = ac.submit(self.contest_type,
+        ac.submit(self.contest_type,
                   self.contest_id,
                   self.prob_type,
                   submit_code,
-                  submit_lang_id)
-        res.raise_for_status()
-        if res.status_code == 200:
-            print("Submitted!")
-        else:
-            print("Error in submitting...")
-            exit(1)
+                  lang_type)

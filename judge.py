@@ -1,9 +1,6 @@
 from libpycoder.judge import Judge
 from argparse import ArgumentParser
 
-PYTHON_ID = 3023
-PYPY_ID = 3510
-
 if __name__ == '__main__':
     example = """
     ex1: abc134のd問題をテスト
@@ -46,11 +43,4 @@ if __name__ == '__main__':
     result = judge.test(verbose=args.verbose, diff=args.diff)
 
     if result and args.submit:
-        if args.submit == 'p':
-            submit_lang_id = PYTHON_ID
-        elif args.submit == 'pp':
-            submit_lang_id = PYPY_ID
-        else:
-            print('This option not supported.')
-            exit(1)
-        judge.submit(submit_lang_id)
+        judge.submit(args.submit)

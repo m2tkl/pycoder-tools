@@ -3,6 +3,7 @@ import sys
 from .atscraper import extract_task_screen_name
 from .atscraper import extract_csrf_token
 from .atscraper import extract_prob_links
+from .langs import get_lang_ids
 from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 import config
@@ -88,7 +89,7 @@ class AtConnector:
     def _get_submit_url(self, contest_type, contest_id):
         return CONTEST_URL + contest_type + contest_id + '/submit'
 
-    def submit(self, contest_type, contest_id, prob_type, src, lang_id):
+    def submit(self, contest_type, contest_id, prob_type, src, lang_type):
         if not self.is_login:
             print('Cannot submit because you are not logged in...')
             exit(1)
@@ -97,12 +98,26 @@ class AtConnector:
         task_screen_name = self.get_task_screen_name(contest_type,
                                                      contest_id,
                                                      prob_type)
-        submit_info = {"data.TaskScreenName": task_screen_name,
-                       "csrf_token": csrf_token,
-                       "data.LanguageId": lang_id,
-                       "sourceCode": src}
-        res = self.post(submit_url, data=submit_info)
-        return res
+        lang_ids = get_lang_ids(lang_type)
+        for lang_id in lang_ids:
+            submit_info = {"data.TaskScreenName": task_screen_name,
+                           "csrf_token": csrf_token,
+                           "data.LanguageId": lang_id,
+                           "sourceCode": src}
+            try:
+                res = self.post(submit_url, data=submit_info)
+                res.raise_for_status()
+                # raise_for_status()によって例外が早出されなければ
+                # 提出できたということで終了
+                break
+            except requests.exceptions.HTTPError as e:
+                # 例外が発生した場合は別のidで提出を試みる
+                continue
+        if res.status_code == 200:
+            print('Submit!')
+        else:
+            print('cannot submit...')
+            exit(1)
 
 if __name__ == '__main__':
     ac = AtConnector()
