@@ -17,9 +17,9 @@ PASSWORD = config.PASSWORD
 class AtConnector:
     def __init__(self):
         self.session = None
-        self.is_login = self.init_session()
+        self.is_login = False
 
-    def init_session(self) -> bool:
+    def init_session(self) -> None:
         """セッションをログイン済の状態にする
         config.pyにusername, passwordがなければログインしない，
         なお，ログインしていないとコードの提出ができず，
@@ -30,16 +30,15 @@ class AtConnector:
             is_login: ログイン済ならTrue, ログインしていないならFalse
         """
         self.session = requests.session()
-        if USERNAME == None or PASSWORD == None: return False
+        if USERNAME == None or PASSWORD == None: return None
         csrf_token = self.get_csrf_token(LOGIN_URL)
         login_info = {"csrf_token": csrf_token,
                       "username": USERNAME,
                       "password": PASSWORD}
         res = self.post(LOGIN_URL, data=login_info)
-        res.raise_for_status()
         if res.status_code == 200:
             print("Login success!")
-            return True
+            self.is_login = True
         else:
             print("Login failed...")
             exit(1)
@@ -118,7 +117,3 @@ class AtConnector:
         else:
             print('cannot submit...')
             exit(1)
-
-if __name__ == '__main__':
-    ac = AtConnector()
-    ac.login()

@@ -88,6 +88,7 @@ class Judge:
 
     def submit(self, lang_type):
         ac = AtConnector()
+        ac.init_session()
         with open(self.test_target, 'r') as f:
             submit_code = f.read()
         ac.submit(self.contest_type,
