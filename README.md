@@ -33,14 +33,17 @@ pythonでatcoderやるときに便利なスクリプトです。
 ## 準備
 
 ### 外部ライブラリのインストール
-`beautifulsoup4`、`requests`、`html5lib`のインストールをお願いします。
+```
+pipenv install
+```
+pipenvがない場合はpipenvの導入をお願いします．
 
 ### 設定ファイルの作成
 `pycoder-tools`ディレクトリ直下に`config.py`というファイルを作成します。
 ```python
 USERNAME = 'hoge'
 PASSWORD = 'fuga'
-ATCODER_DIR_PATH = 'piyo'
+ATCODER_DIR_PATH = 'piyo' # ex: '/Users/hoge/Documents/atcoder/'
 ```
 `USERNAME`、`PASSWORD`はatcoderの問題ページからサンプルテストケースを取得する際に必要になります。
 `ATCODER_DIR_PATH`はatcoderを管理している自分のディレクトリへのパスを指定します。  
@@ -71,6 +74,14 @@ atcoder/ABC/xxx/A.py
 ```
 
 ## 使い方
+仮想環境に入る．
+```
+pipenv shell
+```
+仮想環境から出る．
+```
+exit
+```
 
 ### コンテストの準備
 `pycode.py`を実行するとコンテスト用のディレクトリ準備とサンプルテストケースの取得を行います。
