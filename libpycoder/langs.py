@@ -8,4 +8,4 @@ lang_ids = {
 def get_lang_ids(lang_type: str) -> List[int]:
     if lang_type == 'p': return lang_ids['python']
     elif lang_type == 'pp': return lang_ids['pypy']
-    else: return 0
+    else: return None
