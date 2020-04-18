@@ -33,7 +33,11 @@ if __name__ == '__main__':
     # プログラムファイル作成。テンプレートをコピー。
     for fn in file_names:
         if not os.path.exists(dir_name + fn + '.py'):
-            shutil.copy('./template/template.py', dir_name + fn + '.py')
+            if config.TEMPLATE_FILE:
+                template = config.TEMPLATE_FILE
+            else:
+                template = './template/tempalte.py'
+            shutil.copy(template, dir_name + fn + '.py')
     # テスト用のディレクトリを作成
     test_dir_name = pm.ATCODER_DIR + 'tests/'
     if not os.path.exists(test_dir_name):
