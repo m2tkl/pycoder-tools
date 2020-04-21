@@ -34,7 +34,11 @@ class TestMaker():
             # レスポンスの HTML から BeautifulSoup オブジェクトを作る
             soup = BeautifulSoup(res.text, 'html5lib')
             soup = self.__extract_unused_data(soup)
-            test_samples = soup.find_all('pre')
+            test_samples = []
+            for section in soup.find_all('section'):
+                pre = section.find('pre')
+                if pre != None:
+                    test_samples.append(pre)
             test_case = {}
             count = 0
             for i in range(0, len(test_samples), 2):
