@@ -11,27 +11,26 @@ class TestMaker():
         self.contest_type = contest_type
         self.contest_id = contest_id
         self.pm = PathManager(contest_type, contest_id)
-        self.ac = AtConnector()
-        self.ac.init_session()
 
     def fetch_sample_cases(self):
+        ac = AtConnector()
+        ac.init_session()
+        prob_urls = ac.get_prob_urls(self.contest_type, self.contest_id)
         problems = ['a', 'b', 'c', 'd', 'e', 'f']
-        prob_urls = self.ac.get_prob_urls(self.contest_type, self.contest_id)
         for p in problems:
             print('*', end='')
             url = prob_urls[p]
             if url == '': continue
             # login済みのセッションを利用して、HTMLを取得する
-            res = self.ac.session.get(url)
-            # レスポンスの HTML から BeautifulSoup オブジェクトを作る
+            res = ac.get(url)
             soup = BeautifulSoup(res.text, 'html5lib')
             sample_test_cases = extract_sample_test_cases_from_prob_page(res.text)
             file_dir = self.pm.get_tests_dir_path(p)
-            for k, v in sample_test_cases.items():
-                iname = '0' + str(k) + '_input.txt'
-                oname = '0' + str(k) + '_output.txt'
-                with open(file_dir + iname, 'w') as f: f.write(v[0])
-                with open(file_dir + oname, 'w') as f: f.write(v[1])
+            for idx, sample_case in sample_test_cases.items():
+                iname = '0' + str(idx) + '_input.txt'
+                oname = '0' + str(idx) + '_output.txt'
+                with open(file_dir + iname, 'w') as f: f.write(sample_case.input)
+                with open(file_dir + oname, 'w') as f: f.write(sample_case.output)
         print('\nDone!')
 
     def add_test_case(self, problem_type):
