@@ -14,15 +14,6 @@ class TestMaker():
         self.ac = AtConnector()
         self.ac.init_session()
 
-    def __extract_unused_data(self, soup_obj):
-        # 英語ケースを削除
-        while soup_obj.find('span', class_='lang-en'):
-            soup_obj.find('span', class_='lang-en').extract()
-        # 入力形式の欄をテストケースとして取得しないように削除
-        while soup_obj.find('div', class_='io-style'):
-            soup_obj.find('div', class_='io-style').extract()
-        return soup_obj
-
     def fetch_sample_cases(self):
         problems = ['a', 'b', 'c', 'd', 'e', 'f']
         prob_urls = self.ac.get_prob_urls(self.contest_type, self.contest_id)
