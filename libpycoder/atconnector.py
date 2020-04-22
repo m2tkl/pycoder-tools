@@ -20,14 +20,10 @@ class AtConnector:
         self.is_login = False
 
     def init_session(self) -> None:
-        """セッションをログイン済の状態にする
-        config.pyにusername, passwordがなければログインしない，
-        なお，ログインしていないとコードの提出ができず，
-        開催中のコンテストではサンプルケースの取得ができない
-        コード提出
-        Args:
-        Returns:
-            is_login: ログイン済ならTrue, ログインしていないならFalse
+        """セッションをログイン済の状態にする.
+        config.pyにusername, passwordがなければログインしない.
+        なお,ログインしていないとコードの提出ができず,
+        開催中のコンテストではサンプルケースの取得ができない.
         """
         self.session = requests.session()
         if USERNAME == None or PASSWORD == None: return None
