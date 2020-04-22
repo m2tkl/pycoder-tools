@@ -56,3 +56,16 @@ class TestAtScraper:
         }
         actual = extract_prob_links(html)
         assert actual == expected
+
+    def test_extract_sample_test_cases_from_prob_page(self):
+        test_src_path = ''.join([os.path.dirname(__file__),
+                                 '/sources/prob.html',])
+        with open(test_src_path, 'r') as f:
+            html = f.read()
+        expected = {
+            0: ('1 1\n', '1\n'),
+            1: ('2 2\n', '2\n'),
+            2: ('3 3\n', '3\n'),
+        }
+        actual = extract_sample_test_cases_from_prob_page(html)
+        assert actual == expected
