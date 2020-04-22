@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import config
 from .atconnector import AtConnector
 from .pathmanager import PathManager
+from .atscraper import extract_sample_test_cases_from_prob_page
 import sys, os
 
 class TestMaker():
@@ -33,19 +34,9 @@ class TestMaker():
             res = self.ac.session.get(url)
             # レスポンスの HTML から BeautifulSoup オブジェクトを作る
             soup = BeautifulSoup(res.text, 'html5lib')
-            soup = self.__extract_unused_data(soup)
-            test_samples = []
-            for section in soup.find_all('section'):
-                pre = section.find('pre')
-                if pre != None:
-                    test_samples.append(pre)
-            test_case = {}
-            for i in range(0, len(test_samples), 2):
-                test_case[i//2] = (test_samples[i].get_text(),
-                                    test_samples[i+1].get_text())
-            # サンプルケースをファイルへ書き込む
+            sample_test_cases = extract_sample_test_cases_from_prob_page(res.text)
             file_dir = self.pm.get_tests_dir_path(p)
-            for k, v in test_case.items():
+            for k, v in sample_test_cases.items():
                 iname = '0' + str(k) + '_input.txt'
                 oname = '0' + str(k) + '_output.txt'
                 with open(file_dir + iname, 'w') as f: f.write(v[0])
