@@ -40,11 +40,9 @@ class TestMaker():
                 if pre != None:
                     test_samples.append(pre)
             test_case = {}
-            count = 0
             for i in range(0, len(test_samples), 2):
-                test_case[count] = (test_samples[i].get_text(),
+                test_case[i//2] = (test_samples[i].get_text(),
                                     test_samples[i+1].get_text())
-                count += 1
             # サンプルケースをファイルへ書き込む
             file_dir = self.pm.get_tests_dir_path(p)
             for k, v in test_case.items():
