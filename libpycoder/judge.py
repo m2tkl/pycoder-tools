@@ -27,25 +27,11 @@ class Judge:
         print('test num: {}'.format(len(self.test_cases)))
         total_result = True
         for test_case in self.test_cases:
-            prefix = test_case.input[:2]
-            # prefixの2桁目が0の場合はsampleテストケース,それ以外は追加したテストケースを表す
-            if prefix[0] == '0':
-                pprint('sample_case' + prefix + ' => ', end='', bold=True)
-            else:
-                pprint('additional_case' + prefix + ' => ', end='', bold=True)
-
             actual = self.run_program(self.test_target, self.tests_dir + test_case.input)
             expected = self.get_expected_val(self.tests_dir + test_case.output)
-
             result = self.judge(actual, expected, diff)
-
             total_result &= result
-
-            with open(self.tests_dir + test_case.input) as f:
-                input_val = f.read().rstrip()
-
-            # Show results
-            self.print_result(result, input_val, actual, expected, verbose)
+            self.print_result(result, test_case, actual, expected, verbose)
         return total_result
 
     def run_program(self, target: str, target_input:str) -> str:
@@ -71,7 +57,15 @@ class Judge:
         else:
             return actual == expected
 
-    def print_result(self, result: bool, input_val, actual, expected, verbose: bool = None):
+    def print_result(self, result: bool, test_case, actual, expected, verbose: bool = None):
+        prefix = test_case.input[:2]
+        if prefix[0] == '0':
+            pprint('sample_case' + prefix + ' => ', end='', bold=True)
+        else:
+            pprint('additional_case' + prefix + ' => ', end='', bold=True)
+        if verbose:
+            with open(self.tests_dir + test_case.input) as f:
+                input_val = f.read().rstrip()
         if result:
             pprint('OK', color='green')
             if verbose:
