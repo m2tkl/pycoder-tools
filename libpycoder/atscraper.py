@@ -3,6 +3,15 @@ from bs4 import BeautifulSoup as bs
 from collections import namedtuple
 
 def extract_task_screen_name(html: str, prob_type: str) -> str:
+    """コンテスト問題一覧ページから、prob_typeで指定された問題の名前を取得
+    @param html コンテストの問題一覧ページ
+    @param prob_type 問題のタイプ(a,b,c,...)
+    @return task_screen_name 問題の名前
+        ex: abc160_a
+        !! 必ずしもコンテスト番号、問題のタイプと、
+        取得するtask_screen_nameは一致しない。
+        例えば、abc123のa問題のtask_screen_nameがarc012_bということがある。
+    """
     prob_links = extract_prob_links(html)
     task_screen_name = ''
     for p_type, link in prob_links.items():
@@ -14,11 +23,19 @@ def extract_task_screen_name(html: str, prob_type: str) -> str:
     return task_screen_name
 
 def extract_csrf_token(html: str) -> str:
+    """htmlからcsrfトークンを取得する.
+    @param html csrfトークンを取得したいページ
+    @return csrf_token
+    """
     soup = bs(html, 'html5lib')
     csrf_token = soup.find(attrs={'name': 'csrf_token'}).get('value')
     return csrf_token
 
 def extract_prob_links(html: str) -> Dict[str, str]:
+    """問題一覧ページから各問題へのパスを取得する.
+    @param html 問題一覧ページ
+    @return prob_links 各問題のパス
+    """
     soup = bs(html, 'html5lib')
     prob_links = {'a': '', 'b': '', 'c': '', 'd': '', 'e': '', 'f': '',}
     for tr in soup.find('tbody').find_all('tr'):
@@ -47,10 +64,9 @@ def extract_sample_test_cases_from_prob_page(html: str) -> Dict[int, Tuple[str,s
         # section内の先頭以外のpreは'間違いの例'などサンプルケースでないことがあるため、
         # 先頭のpreのみを取得する
         pre = sec.find('pre')
-        # 問題文もsection内にあるが、問題文にはpreタグは存在しないため
-        # preタグの有無でサンプルケースを取得することができる。
-        if pre != None:
-            io_samples.append(pre)
+        # 問題文もsection内にあるが、問題文にはpreタグは存在しない.
+        if pre == None: continue
+        io_samples.append(pre)
 
     TestCase = namedtuple('TestCase', ['input', 'output'])
     sample_test_cases = {}
