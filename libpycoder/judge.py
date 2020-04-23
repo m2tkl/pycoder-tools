@@ -28,7 +28,7 @@ class Judge:
         TestCase = namedtuple('TestCase', ['input', 'output'])
         self.test_case_files = [TestCase(*test_case) for test_case in zip(input_files, output_files)]
 
-    def test(self, diff: float=None, verbose: bool=False) -> bool:
+    def test_all(self, diff: float=None, verbose: bool=False) -> bool:
         """テストスイートを実行する.
         @param diff テスト時に誤差を判定に使う場合に指定する.
         @param verbose 結果表示を冗長にする場合Trueを指定する.

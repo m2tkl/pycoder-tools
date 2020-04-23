@@ -45,7 +45,7 @@ if __name__ == '__main__':
                   args.contest_id,
                   args.problem_type)
 
-    result = judge.test(verbose=args.verbose, diff=args.diff)
+    result = judge.test_all(verbose=args.verbose, diff=args.diff)
 
     if (result or args.force) and args.submit:
         judge.submit(args.submit)
