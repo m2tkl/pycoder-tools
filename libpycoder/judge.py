@@ -6,6 +6,7 @@ from .pathmanager import PathManager
 from utils.pycolor import pprint
 from bs4 import BeautifulSoup
 import requests
+from collections import namedtuple
 
 class Judge:
     def __init__(self, contest_type, contest_id, prob_type):
@@ -17,39 +18,35 @@ class Judge:
         self.prob_type = prob_type
 
         test_files = sorted(os.listdir(self.tests_dir))
-        self.test_cases = []
-        for i in range(0, len(test_files), 2):
-            # 00_input.txt, 00_output.txtをまとめてtest_caseとする
-            test_case = (test_files[i], test_files[i+1])
-            self.test_cases.append(test_case)
+        input_files = test_files[0::2]
+        output_files = test_files[1::2]
+        TestCase = namedtuple('TestCase', ['input', 'output'])
+        self.test_cases = [TestCase(*test_case) for test_case in zip(input_files, output_files)]
 
     def test(self, diff=None, verbose=False) -> bool:
         print('test num: {}'.format(len(self.test_cases)))
-        all_result = True
-        for test in self.test_cases:
-            test_input = test[0]
-            test_output = test[1]
-            prefix = test_input[:2]
-            # prefixの２桁目が0の場合はsampleテストケース,それ以外の場合は追加したテストケースを表す
+        total_result = True
+        for test_case in self.test_cases:
+            prefix = test_case.input[:2]
+            # prefixの2桁目が0の場合はsampleテストケース,それ以外は追加したテストケースを表す
             if prefix[0] == '0':
                 pprint('sample_case' + prefix + ' => ', end='', bold=True)
             else:
                 pprint('additional_case' + prefix + ' => ', end='', bold=True)
 
-            actual = self.run_program(self.test_target, self.tests_dir+test_input)
-            expected = self.get_expected_val(self.tests_dir+test_output)
+            actual = self.run_program(self.test_target, self.tests_dir + test_case.input)
+            expected = self.get_expected_val(self.tests_dir + test_case.output)
 
-            # Judge!
-            # --diffオプションを指定した場合は誤差を判定する
-            if diff: result = self.judge_diff(actual, expected, diff)
-            else:    result = self.judge_equal(actual, expected)
-            all_result &= result
+            result = self.judge(actual, expected, diff)
 
-            with open(self.tests_dir + test_input) as f: input_val = f.read().rstrip()
+            total_result &= result
+
+            with open(self.tests_dir + test_case.input) as f:
+                input_val = f.read().rstrip()
 
             # Show results
             self.print_result(result, input_val, actual, expected, verbose)
-        return all_result
+        return total_result
 
     def run_program(self, target: str, target_input:str) -> str:
         # ex: python <atcoder-dir-path>/ABC/134/A.py < <atcoder-dir-path>/ABC/134/tests/A/00_input.txt
@@ -62,11 +59,17 @@ class Judge:
         with open(file_name, 'r') as f: expected = f.read().rstrip()
         return expected
 
-    def judge_equal(self, actual:str, expected:str) -> bool:
-        return actual == expected
-
-    def judge_diff(self, actual: str, expected: str, diff: float):
-       return abs(float(expected) - float(actual)) < diff
+    def judge(self, actual: str, expected: str, diff: float = None):
+        """正誤判定を行う.
+        @param actual 実際の出力
+        @param expected 期待される出力
+        @param diff 指定された場合は誤差を正誤判定に用いる.
+        @return 正解ならばTrue, 不正解ならばFalse
+        """
+        if diff != None:
+            return abs(float(expected) - float(actual)) < diff
+        else:
+            return actual == expected
 
     def print_result(self, result: bool, input_val, actual, expected, verbose: bool = None):
         if result:
