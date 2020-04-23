@@ -51,6 +51,11 @@ class Judge:
         return total_result
 
     def run_program(self, target: str, target_input:str) -> str:
+        """targetプログラムに入力を与え,実行結果(出力)を返す.
+        @param target 実行対象プログラムのpath
+        @param target_input 入力ファイルのpath
+        @return res 実行結果(出力)
+        """
         # ex: python <atcoder-dir-path>/ABC/134/A.py < <atcoder-dir-path>/ABC/134/tests/A/00_input.txt
         command = ' '.join(['python', target, '<', target_input])
         std = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
