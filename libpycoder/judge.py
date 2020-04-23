@@ -8,6 +8,11 @@ from bs4 import BeautifulSoup
 import requests
 from collections import namedtuple
 
+def read_file(file_path: str) -> str:
+    with open(file_path, 'r') as f:
+        content = f.read().rstrip()
+    return content
+
 class Judge:
     def __init__(self, contest_type, contest_id, prob_type):
         self.pm = PathManager(contest_type, contest_id)
@@ -37,7 +42,7 @@ class Judge:
             test_output_path = self.tests_dir + test_case_file.output
 
             actual = self.run_program(run_target_path, test_input_path)
-            expected = self.read_file(test_output_path)
+            expected = read_file(test_output_path)
             result = self.judge(actual, expected, diff)
             total_result &= result
 
@@ -51,11 +56,6 @@ class Judge:
         std = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
         res = std.stdout.decode('utf-8').rstrip()
         return res
-
-    def read_file(self, file_name: str) -> str:
-        with open(file_name, 'r') as f:
-            content = f.read().rstrip()
-        return content
 
     def judge(self, actual: str, expected: str, diff: float = None):
         """正誤判定を行う.
@@ -88,8 +88,7 @@ class Judge:
 
         # verboseオプションありの場合は, 入出力を表示する.
         if verbose:
-            with open(self.tests_dir + input_file) as f:
-                input_val = f.read().rstrip()
+            input_val = read_file(self.tests_dir + input_file)
             print('[input]\n{}'.format(input_val))
             if result == True:
                 print('[output]\n{}'.format(actual))
@@ -102,8 +101,7 @@ class Judge:
     def submit(self, lang_type):
         ac = AtConnector()
         ac.init_session()
-        with open(self.test_target, 'r') as f:
-            submit_code = f.read()
+        submit_code = read_file(self.test_target)
         ac.submit(self.contest_type,
                   self.contest_id,
                   self.prob_type,
