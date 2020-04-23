@@ -1,6 +1,7 @@
-from typing import Dict, List, Tuple
+from typing import Dict, Tuple
 from bs4 import BeautifulSoup as bs
 from collections import namedtuple
+
 
 def extract_task_screen_name(html: str, prob_type: str) -> str:
     """コンテスト問題一覧ページから、prob_typeで指定された問題の名前を取得
@@ -22,6 +23,7 @@ def extract_task_screen_name(html: str, prob_type: str) -> str:
             break
     return task_screen_name
 
+
 def extract_csrf_token(html: str) -> str:
     """htmlからcsrfトークンを取得する.
     @param html csrfトークンを取得したいページ
@@ -31,21 +33,24 @@ def extract_csrf_token(html: str) -> str:
     csrf_token = soup.find(attrs={'name': 'csrf_token'}).get('value')
     return csrf_token
 
+
 def extract_prob_links(html: str) -> Dict[str, str]:
     """問題一覧ページから各問題へのパスを取得する.
     @param html 問題一覧ページ
     @return prob_links 各問題のパス
     """
     soup = bs(html, 'html5lib')
-    prob_links = {'a': '', 'b': '', 'c': '', 'd': '', 'e': '', 'f': '',}
+    prob_links = {'a': '', 'b': '', 'c': '', 'd': '', 'e': '', 'f': '', }
     for tr in soup.find('tbody').find_all('tr'):
         item = tr.find('td').find('a')
         p_type = item.contents[0].lower()
-        link = item.get('href') # ex: /contests/abc160/tasks/abc160_a
+        link = item.get('href')  # ex: /contests/abc160/tasks/abc160_a
         prob_links[p_type] = link
     return prob_links
 
-def extract_sample_test_cases_from_prob_page(html: str) -> Dict[int, Tuple[str,str]]:
+
+def extract_sample_test_cases_from_prob_page(html: str) \
+        -> Dict[int, Tuple[str, str]]:
     """問題ページからサンプルテストケースを抽出する.
     @param html 問題ページ
     @return 問題ページのサンプルテストケース.
@@ -65,11 +70,13 @@ def extract_sample_test_cases_from_prob_page(html: str) -> Dict[int, Tuple[str,s
         # 先頭のpreのみを取得する
         pre = sec.find('pre')
         # 問題文もsection内にあるが、問題文にはpreタグは存在しない.
-        if pre == None: continue
+        if pre is None:
+            continue
         io_samples.append(pre)
 
     TestCase = namedtuple('TestCase', ['input', 'output'])
     sample_test_cases = {}
     for i in range(0, len(io_samples), 2):
-        sample_test_cases[i//2] = TestCase(io_samples[i].get_text(), io_samples[i+1].get_text())
+        sample_test_cases[i//2] = TestCase(io_samples[i].get_text(),
+                                           io_samples[i+1].get_text())
     return sample_test_cases

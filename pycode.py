@@ -1,4 +1,3 @@
-import sys, os
 import subprocess
 from argparse import ArgumentParser
 
@@ -19,7 +18,7 @@ if __name__ == '__main__':
     args = argparser.parse_args()
 
     contest_type = args.contest_type
-    contest_id   = args.contest_id
+    contest_id = args.contest_id
 
     command_dir = ['python', 'makedir.py', contest_type, contest_id]
     subprocess.run(' '.join(command_dir), shell=True)

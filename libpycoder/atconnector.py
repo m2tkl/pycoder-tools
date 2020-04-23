@@ -14,6 +14,7 @@ CONTEST_URL = 'https://atcoder.jp/contests/'
 USERNAME = config.USERNAME
 PASSWORD = config.PASSWORD
 
+
 class AtConnector:
     def __init__(self):
         self.session = None
@@ -26,7 +27,8 @@ class AtConnector:
         開催中のコンテストではサンプルケースの取得ができない.
         """
         self.session = requests.session()
-        if USERNAME == None or PASSWORD == None: return None
+        if USERNAME is None or PASSWORD is None:
+            return None
         csrf_token = self.get_csrf_token(LOGIN_URL)
         login_info = {"csrf_token": csrf_token,
                       "username": USERNAME,
@@ -105,7 +107,7 @@ class AtConnector:
                 # raise_for_status()によって例外が早出されなければ
                 # 提出できたということで終了
                 break
-            except requests.exceptions.HTTPError as e:
+            except requests.exceptions.HTTPError:
                 # 例外が発生した場合は別のidで提出を試みる
                 continue
         if res.status_code == 200:

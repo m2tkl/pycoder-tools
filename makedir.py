@@ -1,4 +1,4 @@
-import sys, os
+import os
 import shutil
 import config
 from argparse import ArgumentParser
@@ -45,4 +45,3 @@ if __name__ == '__main__':
             os.makedirs(test_dir_name + fn)
     else:
         print('test directory alread exists')
-

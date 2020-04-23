@@ -12,7 +12,8 @@ UNDERLINE = '\033[4m'
 INVISIBLE = '\033[08m'
 REVERCE = '\033[07m'
 
-def paint(s:str, color='', bold=True) -> str:
+
+def paint(s: str, color='', bold=True) -> str:
     """stringを装飾する
     Args:
         s: 装飾対象の文字
@@ -22,10 +23,12 @@ def paint(s:str, color='', bold=True) -> str:
         res: 装飾した文字
     """
     res = select_color(color) + s
-    if bold: res = BOLD + res
+    if bold:
+        res = BOLD + res
     return res + END
 
-def pprint(s:str, color='', bold=True, end=None) -> None:
+
+def pprint(s: str, color='', bold=True, end=None) -> None:
     """文字を装飾してprintする
     Args:
         s: printする文字
@@ -36,7 +39,8 @@ def pprint(s:str, color='', bold=True, end=None) -> None:
     res = paint(s, color, bold)
     print(res, end=end)
 
-def select_color(color:str) -> str:
+
+def select_color(color: str) -> str:
     """指定された色のコードを返す
     Args:
         color: 色
