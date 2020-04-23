@@ -23,15 +23,26 @@ class Judge:
         TestCase = namedtuple('TestCase', ['input', 'output'])
         self.test_case_files = [TestCase(*test_case) for test_case in zip(input_files, output_files)]
 
-    def test(self, diff=None, verbose=False) -> bool:
+    def test(self, diff: float=None, verbose: bool=False) -> bool:
+        """テストスイートを実行する.
+        @param diff テスト時に誤差を判定に使う場合に指定する.
+        @param verbose 結果表示を冗長にする場合Trueを指定する.
+        """
         print('test num: {}'.format(len(self.test_case_files)))
+
         total_result = True
         for test_case_file in self.test_case_files:
-            actual = self.run_program(self.test_target, self.tests_dir + test_case_file.input)
-            expected = self.get_expected_val(self.tests_dir + test_case_file.output)
+            run_target_path = self.test_target
+            test_input_path = self.tests_dir + test_case_file.input
+            test_output_path = self.tests_dir + test_case_file.output
+
+            actual = self.run_program(run_target_path, test_input_path)
+            expected = self.read_file(test_output_path)
             result = self.judge(actual, expected, diff)
             total_result &= result
+
             self.print_result(result, test_case_file.input, actual, expected, verbose)
+
         return total_result
 
     def run_program(self, target: str, target_input:str) -> str:
@@ -41,9 +52,10 @@ class Judge:
         res = std.stdout.decode('utf-8').rstrip()
         return res
 
-    def get_expected_val(self, file_name: str) -> str:
-        with open(file_name, 'r') as f: expected = f.read().rstrip()
-        return expected
+    def read_file(self, file_name: str) -> str:
+        with open(file_name, 'r') as f:
+            content = f.read().rstrip()
+        return content
 
     def judge(self, actual: str, expected: str, diff: float = None):
         """正誤判定を行う.
@@ -58,6 +70,13 @@ class Judge:
             return actual == expected
 
     def print_result(self, result: bool, input_file, actual, expected, verbose: bool = None):
+        """テスト実行結果の表示を行う.
+        @param result 正誤判定
+        @param input_file テストの入力
+        @param actual 実行結果
+        @param expected 期待される出力
+        @param verbose Trueの場合,正誤判定だけでなく,入出力の値も表示する
+        """
         # どのテストケースであるかを表示する.
         prefix = input_file[:2]
         if prefix[0] == '0': pprint('sample_case' + prefix + ' => ', end='', bold=True)
