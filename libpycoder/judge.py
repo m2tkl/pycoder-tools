@@ -29,26 +29,39 @@ class Judge:
         self.test_case_files = [TestCase(*test_case) for test_case in zip(input_files, output_files)]
 
     def test_all(self, diff: float=None, verbose: bool=False) -> bool:
-        """テストスイートを実行する.
+        """全てのテストスイートを実行し, 結果を返す.
         @param diff テスト時に誤差を判定に使う場合に指定する.
         @param verbose 結果表示を冗長にする場合Trueを指定する.
         """
         print('test num: {}'.format(len(self.test_case_files)))
-
         total_result = True
         for test_case_file in self.test_case_files:
             run_target_path = self.test_target
             test_input_path = self.tests_dir + test_case_file.input
             test_output_path = self.tests_dir + test_case_file.output
-
-            actual = self.run_program(run_target_path, test_input_path)
-            expected = read_file(test_output_path)
-            result = self.judge(actual, expected, diff)
+            result = self.test(
+                    run_target_path, test_input_path, test_output_path,
+                    diff, verbose)
             total_result &= result
-
-            self.print_result(result, test_case_file.input, actual, expected, verbose)
-
         return total_result
+
+    def test(
+            self, run_target_path,
+            test_input_path, test_output_path,
+            diff:float=None, verbose:bool=False) -> bool:
+        """テストケースを実行し,結果を返す.
+        @param run_target_path テスト対象プログラムのpath
+        @param test_input_path テストの入力
+        @param test_output_path 期待される出力
+        @param diff 誤差判定オプション
+        @param verbose 詳細結果表示オプション
+        @return result 判定結果
+        """
+        actual = self.run_program(run_target_path, test_input_path)
+        expected = read_file(test_output_path)
+        result = self.judge(actual, expected, diff)
+        self.print_result(result, test_input_path, actual, expected, verbose)
+        return result
 
     def run_program(self, target: str, target_input:str) -> str:
         """targetプログラムに入力を与え,実行結果(出力)を返す.
@@ -83,7 +96,7 @@ class Judge:
         @param verbose Trueの場合,正誤判定だけでなく,入出力の値も表示する
         """
         # どのテストケースであるかを表示する.
-        prefix = input_file[:2]
+        prefix = input_file.split('/')[-1][:2]
         if prefix[0] == '0': pprint('sample_case' + prefix + ' => ', end='', bold=True)
         else: pprint('additional_case' + prefix + ' => ', end='', bold=True)
 
@@ -93,7 +106,7 @@ class Judge:
 
         # verboseオプションありの場合は, 入出力を表示する.
         if verbose:
-            input_val = read_file(self.tests_dir + input_file)
+            input_val = read_file(input_file)
             print('[input]\n{}'.format(input_val))
             if result == True:
                 print('[output]\n{}'.format(actual))
