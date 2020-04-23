@@ -21,23 +21,23 @@ class Judge:
         input_files = test_files[0::2]
         output_files = test_files[1::2]
         TestCase = namedtuple('TestCase', ['input', 'output'])
-        self.test_cases = [TestCase(*test_case) for test_case in zip(input_files, output_files)]
+        self.test_case_files = [TestCase(*test_case) for test_case in zip(input_files, output_files)]
 
     def test(self, diff=None, verbose=False) -> bool:
-        print('test num: {}'.format(len(self.test_cases)))
+        print('test num: {}'.format(len(self.test_case_files)))
         total_result = True
-        for test_case in self.test_cases:
-            actual = self.run_program(self.test_target, self.tests_dir + test_case.input)
-            expected = self.get_expected_val(self.tests_dir + test_case.output)
+        for test_case_file in self.test_case_files:
+            actual = self.run_program(self.test_target, self.tests_dir + test_case_file.input)
+            expected = self.get_expected_val(self.tests_dir + test_case_file.output)
             result = self.judge(actual, expected, diff)
             total_result &= result
-            self.print_result(result, test_case, actual, expected, verbose)
+            self.print_result(result, test_case_file.input, actual, expected, verbose)
         return total_result
 
     def run_program(self, target: str, target_input:str) -> str:
         # ex: python <atcoder-dir-path>/ABC/134/A.py < <atcoder-dir-path>/ABC/134/tests/A/00_input.txt
-        command = ['python', target, '<', target_input]
-        std = subprocess.run(' '.join(command), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+        command = ' '.join(['python', target, '<', target_input])
+        std = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
         res = std.stdout.decode('utf-8').rstrip()
         return res
 
@@ -57,31 +57,28 @@ class Judge:
         else:
             return actual == expected
 
-    def print_result(self, result: bool, test_case, actual, expected, verbose: bool = None):
-        prefix = test_case.input[:2]
-        if prefix[0] == '0':
-            pprint('sample_case' + prefix + ' => ', end='', bold=True)
-        else:
-            pprint('additional_case' + prefix + ' => ', end='', bold=True)
+    def print_result(self, result: bool, input_file, actual, expected, verbose: bool = None):
+        # どのテストケースであるかを表示する.
+        prefix = input_file[:2]
+        if prefix[0] == '0': pprint('sample_case' + prefix + ' => ', end='', bold=True)
+        else: pprint('additional_case' + prefix + ' => ', end='', bold=True)
+
+        # 結果(OK or NG)の表示
+        if result == True: pprint('OK', color='g')
+        else: pprint('NG', color='r')
+
+        # verboseオプションありの場合は, 入出力を表示する.
         if verbose:
-            with open(self.tests_dir + test_case.input) as f:
+            with open(self.tests_dir + input_file) as f:
                 input_val = f.read().rstrip()
-        if result:
-            pprint('OK', color='green')
-            if verbose:
-                print('[input]')
-                print('{}'.format(input_val))
-                print('[output]')
-                print('{}'.format(actual))
-        else:
-            pprint('NG', color='r')
-            if verbose:
-                print('[input]')
-                print('{}'.format(input_val))
-            pprint('[expected]', color='g')
-            pprint('{}'.format(expected), color='g')
-            pprint('[actual]', color='r')
-            pprint('{}'.format(actual), color='r')
+            print('[input]\n{}'.format(input_val))
+            if result == True:
+                print('[output]\n{}'.format(actual))
+
+        # 不正解の場合はverboseオプションに関わらず出力を表示する.
+        if result == False:
+            pprint('[expected]\n{}'.format(expected), color='g')
+            pprint('[actual]\n{}'.format(actual), color='r')
 
     def submit(self, lang_type):
         ac = AtConnector()
