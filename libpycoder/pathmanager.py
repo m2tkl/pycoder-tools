@@ -1,12 +1,14 @@
-import sys, os
+import importlib
+import sys
 from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
-import config
+config = importlib.import_module('config')
+
 
 class PathManager:
     CONTEST_URL = 'https://atcoder.jp/contests/'
-    SUBMIT_URL  = ''
+    SUBMIT_URL = ''
     ATCODER_DIR = ''
 
     def __init__(self, contest_type, contest_id):
@@ -20,7 +22,7 @@ class PathManager:
 
     def _set_atcoder_dir_path(self, root_path):
         res = ''
-        if not root_path == None:
+        if root_path is not None:
             res = root_path
         else:
             res = './'
@@ -50,7 +52,9 @@ class PathManager:
             contest_url: コンテストの問題一覧ページのurl
         """
         contest_url = \
-            PathManager.CONTEST_URL + self.contest_type + self.contest_id + '/tasks'
+            PathManager.CONTEST_URL \
+            + self.contest_type + self.contest_id \
+            + '/tasks'
         return contest_url
 
     def get_submit_url(self):
@@ -61,6 +65,7 @@ class PathManager:
         return file_path
 
     def get_tests_dir_path(self, prob_type):
-        tests_path = PathManager.ATCODER_DIR + 'tests/' + prob_type.upper() + '/'
+        tests_path = \
+            PathManager.ATCODER_DIR \
+            + 'tests/' + prob_type.upper() + '/'
         return tests_path
-

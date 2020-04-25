@@ -1,3 +1,4 @@
+import importlib
 import requests
 import sys
 from .atscraper import extract_task_screen_name
@@ -5,8 +6,9 @@ from .atscraper import extract_csrf_token
 from .atscraper import extract_prob_links
 from .langs import get_lang_ids
 from pathlib import Path
+
 sys.path.append(str(Path(__file__).resolve().parent.parent))
-import config
+config = importlib.import_module('config')
 
 ATCODER_URL = 'https://atcoder.jp'
 LOGIN_URL = 'https://atcoder.jp/login'
@@ -14,23 +16,21 @@ CONTEST_URL = 'https://atcoder.jp/contests/'
 USERNAME = config.USERNAME
 PASSWORD = config.PASSWORD
 
+
 class AtConnector:
     def __init__(self):
         self.session = None
         self.is_login = False
 
     def init_session(self) -> None:
-        """セッションをログイン済の状態にする
-        config.pyにusername, passwordがなければログインしない，
-        なお，ログインしていないとコードの提出ができず，
-        開催中のコンテストではサンプルケースの取得ができない
-        コード提出
-        Args:
-        Returns:
-            is_login: ログイン済ならTrue, ログインしていないならFalse
+        """セッションをログイン済の状態にする.
+        config.pyにusername, passwordがなければログインしない.
+        なお,ログインしていないとコードの提出ができず,
+        開催中のコンテストではサンプルケースの取得ができない.
         """
         self.session = requests.session()
-        if USERNAME == None or PASSWORD == None: return None
+        if USERNAME is None or PASSWORD is None:
+            return None
         csrf_token = self.get_csrf_token(LOGIN_URL)
         login_info = {"csrf_token": csrf_token,
                       "username": USERNAME,
@@ -109,7 +109,7 @@ class AtConnector:
                 # raise_for_status()によって例外が早出されなければ
                 # 提出できたということで終了
                 break
-            except requests.exceptions.HTTPError as e:
+            except requests.exceptions.HTTPError:
                 # 例外が発生した場合は別のidで提出を試みる
                 continue
         if res.status_code == 200:

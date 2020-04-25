@@ -4,6 +4,8 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+autopep8 = "*"
+flake8 = "*"
 
 [packages]
 requests = "*"
@@ -21,6 +23,8 @@ python_version = "3.6"
 [scripts]
 'test' = "pytest -v"
 'test:cov' = "pytest -v --cov=."
+'lint' = "flake8 --exclude 'template tests config.py' --show-source ."
+'format' = "autopep8 -ivr . --exclude template,tests,config.py"
 'judge' = "python judge.py"
 'pycode' = "python pycode.py"
 'addtest' = "python testmake.py"
