@@ -63,7 +63,7 @@ class AtConnector:
     def get_task_screen_name(
             self,
             contest_type: str,
-            contest_id: int,
+            contest_id: str,
             prob_type: str) -> str:
         """
         @param contest_type コンテストの種類(abc, arc, ...)
@@ -78,7 +78,7 @@ class AtConnector:
     def get_prob_urls(
             self,
             contest_type: str,
-            contest_id: int) -> Dict[str, str]:
+            contest_id: str) -> Dict[str, str]:
         """コンテスト問題一覧ページから各問題のurlを取得して返す
         @param contest_type abc, arc, agc, ...
         @param contest_id 123, ...
@@ -93,7 +93,7 @@ class AtConnector:
     def _get_contest_tasks_page(
             self,
             contest_type: str,
-            contest_id: int) -> str:
+            contest_id: str) -> str:
         """問題一覧ページのhtmlを取得する.
         @param contest_type コンテストのタイプ(abc, arc, ...)
         @param contest_id コンテスト番号
@@ -104,7 +104,7 @@ class AtConnector:
         html = res.text
         return html
 
-    def _get_tasks_url(self, contest_type: str, contest_id: int) -> str:
+    def _get_tasks_url(self, contest_type: str, contest_id: str) -> str:
         """問題一覧ページのurlを返す.
         @param contest_type コンテストのタイプ(abc, arc, ...)
         @param contest_id コンテスト番号
@@ -112,7 +112,7 @@ class AtConnector:
         """
         return CONTEST_URL + contest_type + contest_id + '/tasks'
 
-    def _get_submit_url(self, contest_type: str, contest_id: int) -> str:
+    def _get_submit_url(self, contest_type: str, contest_id: str) -> str:
         """提出ページのurlを返す.
         @param contest_type コンテストのタイプ(abc, arc, ...)
         @param contest_id コンテスト番号
@@ -123,7 +123,7 @@ class AtConnector:
     def submit(
             self,
             contest_type: str,
-            contest_id: int,
+            contest_id: str,
             prob_type: str,
             src: str,
             lang_type: str) -> None:
