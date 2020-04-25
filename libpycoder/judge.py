@@ -110,9 +110,9 @@ class Judge:
 
         # 結果(OK or NG)の表示
         if result:
-            pprint('OK', color='g')
+            pprint('OK', color='green')
         else:
-            pprint('NG', color='r')
+            pprint('NG', color='red')
 
         # verboseオプションありの場合は, 入出力を表示する.
         if verbose:
@@ -123,8 +123,8 @@ class Judge:
 
         # 不正解の場合はverboseオプションに関わらず出力を表示する.
         if not result:
-            pprint('[expected]\n{}'.format(expected), color='g')
-            pprint('[actual]\n{}'.format(actual), color='r')
+            pprint('[expected]\n{}'.format(expected), color='green')
+            pprint('[actual]\n{}'.format(actual), color='red')
 
     def submit(self, lang_type):
         ac = AtConnector()
