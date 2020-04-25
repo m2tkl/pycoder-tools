@@ -1,17 +1,14 @@
-BLACK = '\033[30m'
-RED = '\033[31m'
-GREEN = '\033[32m'
-YELLOW = '\033[33m'
-BLUE = '\033[34m'
-PURPLE = '\033[35m'
-CYAN = '\033[36m'
-WHITE = '\033[37m'
-END = '\033[0m'
-BOLD = '\033[1m'
 UNDERLINE = '\033[4m'
 INVISIBLE = '\033[08m'
 REVERCE = '\033[07m'
+END = '\033[0m'
+BOLD = '\033[1m'
 
+def switch(param):
+    def value(dic):
+        default = dic.get("default")
+        return dic.get(param, default)
+    return value
 
 def paint(s: str, color='', bold=True) -> str:
     """stringを装飾する
@@ -47,17 +44,14 @@ def select_color(color: str) -> str:
     Returns:
         color-code: 色のコード
     """
-    if color == 'white':
-        return WHITE
-    elif color == 'red' or color == 'r':
-        return RED
-    elif color == 'green' or color == 'g':
-        return GREEN
-    elif color == 'yellow':
-        return YELLOW
-    elif color == 'blue':
-        return BLUE
-    elif color == 'cyan':
-        return CYAN
-    else:
-        return ''
+    color_code = switch(color)({
+            'black': '\033[30m',
+            'red': '\033[31m',
+            'green': '\033[32m',
+            'yellow': '\033[33m',
+            'blue': '\033[34m',
+            'purple': '\033[35m',
+            'cyan': '\033[36m',
+            'white': '\033[37m',
+            'default': ''})
+    return color_code
