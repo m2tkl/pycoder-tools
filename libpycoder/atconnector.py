@@ -2,10 +2,8 @@ import importlib
 import requests
 import sys
 from typing import Dict
-from .atscraper import extract_task_screen_name
-from .atscraper import extract_csrf_token
-from .atscraper import extract_prob_links
-from .langs import get_lang_ids
+from . import atscraper
+from . import langs
 from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
@@ -52,7 +50,7 @@ class AtConnector:
         res = self.session.get(url)
         res.raise_for_status()
         html = res.text
-        csrf_token = extract_csrf_token(html)
+        csrf_token = atscraper.extract_csrf_token(html)
         return csrf_token
 
     def post(self, url, data=None):
@@ -74,7 +72,7 @@ class AtConnector:
         @return task_screen_name
         """
         html = self._get_contest_tasks_page(contest_type, contest_id)
-        task_screen_name = extract_task_screen_name(html, prob_type)
+        task_screen_name = atscraper.extract_task_screen_name(html, prob_type)
         return task_screen_name
 
     def get_prob_urls(
@@ -87,7 +85,7 @@ class AtConnector:
         @return prob_links 各問題へのurlを持つdict
         """
         html = self._get_contest_tasks_page(contest_type, contest_id)
-        prob_links = extract_prob_links(html)
+        prob_links = atscraper.extract_prob_links(html)
         for prob_type, link in prob_links.items():
             prob_links[prob_type] = ATCODER_URL + link
         return prob_links
@@ -144,7 +142,7 @@ class AtConnector:
         task_screen_name = self.get_task_screen_name(contest_type,
                                                      contest_id,
                                                      prob_type)
-        lang_ids = get_lang_ids(lang_type)
+        lang_ids = langs.get_lang_ids(lang_type)
         # language updateにより言語Idがコンテストによって異なる
         # 場合があるため、それぞれのIdで提出を試みる
         for lang_id in lang_ids:
