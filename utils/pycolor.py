@@ -12,12 +12,10 @@ def switch(param):
 
 def paint(s: str, color='', bold=True) -> str:
     """stringを装飾する
-    Args:
-        s: 装飾対象の文字
-        color: 色
-        bold: 太字にするかどうか(デフォルトは太字)
-    Returns:
-        res: 装飾した文字
+    @param s 装飾対象の文字
+    @param color 色
+    @param bold 太字にするかどうか(デフォルトは太字)
+    @return res: 装飾した文字
     """
     res = select_color(color) + s
     if bold:
@@ -27,11 +25,10 @@ def paint(s: str, color='', bold=True) -> str:
 
 def pprint(s: str, color='', bold=True, end=None) -> None:
     """文字を装飾してprintする
-    Args:
-        s: printする文字
-        color: 色
-        bold: 太字にするかどうか(デフォルトは太字)
-        end: printのオプション
+    @param s printする文字
+    @param color 色
+    @param bold 太字にするかどうか(デフォルトは太字)
+    @param end printのオプション
     """
     res = paint(s, color, bold)
     print(res, end=end)
@@ -39,10 +36,8 @@ def pprint(s: str, color='', bold=True, end=None) -> None:
 
 def select_color(color: str) -> str:
     """指定された色のコードを返す
-    Args:
-        color: 色
-    Returns:
-        color-code: 色のコード
+    @param color 色
+    @return color-code 色のコード
     """
     color_code = switch(color)({
             'black': '\033[30m',
