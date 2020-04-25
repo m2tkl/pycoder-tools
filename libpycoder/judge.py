@@ -14,14 +14,16 @@ def read_file(file_path: str) -> str:
 
 class Judge:
     def __init__(self, contest_type, contest_id, prob_type):
-        self.pm = PathManager(contest_type, contest_id)
-        self.test_target = self.pm.get_prob_file_path(prob_type)
-        self.tests_dir = self.pm.get_tests_dir_path(prob_type)
         self.contest_type = contest_type
         self.contest_id = contest_id
         self.prob_type = prob_type
 
-        test_files = sorted(os.listdir(self.tests_dir))
+        pm = PathManager(contest_type, contest_id)
+        self.target_src_path = pm.get_prob_file_path(prob_type)
+        tests_dir = pm.get_tests_dir_path(prob_type)
+        test_files = list(map(
+            lambda x: tests_dir + x,
+            sorted(os.listdir(tests_dir))))
         in_files = test_files[0::2]
         out_files = test_files[1::2]
         TestCase = namedtuple('TestCase', ['input', 'output'])
@@ -36,11 +38,13 @@ class Judge:
         print('test num: {}'.format(len(self.test_case_files)))
         total_result = True
         for test_case_file in self.test_case_files:
-            run_target_path = self.test_target
-            test_input_path = self.tests_dir + test_case_file.input
-            test_output_path = self.tests_dir + test_case_file.output
+            run_target_path = self.target_src_path
+            test_input_path = test_case_file.input
+            test_output_path = test_case_file.output
             result = self.test(
-                run_target_path, test_input_path, test_output_path,
+                run_target_path,
+                test_input_path,
+                test_output_path,
                 diff, verbose)
             total_result &= result
         return total_result
@@ -129,7 +133,7 @@ class Judge:
     def submit(self, lang_type):
         ac = AtConnector()
         ac.init_session()
-        submit_code = read_file(self.test_target)
+        submit_code = read_file(self.target_src_path)
         ac.submit(self.contest_type,
                   self.contest_id,
                   self.prob_type,
