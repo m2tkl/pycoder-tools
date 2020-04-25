@@ -1,3 +1,4 @@
+import importlib
 import requests
 import sys
 from .atscraper import extract_task_screen_name
@@ -5,8 +6,9 @@ from .atscraper import extract_csrf_token
 from .atscraper import extract_prob_links
 from .langs import get_lang_ids
 from pathlib import Path
+
 sys.path.append(str(Path(__file__).resolve().parent.parent))
-import config
+config = importlib.import_module('config')
 
 ATCODER_URL = 'https://atcoder.jp'
 LOGIN_URL = 'https://atcoder.jp/login'
