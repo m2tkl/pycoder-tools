@@ -17,18 +17,24 @@ class Judge:
         self.contest_type = contest_type
         self.contest_id = contest_id
         self.prob_type = prob_type
-
         pm = PathManager(contest_type, contest_id)
         self.target_src_path = pm.get_prob_file_path(prob_type)
         tests_dir = pm.get_tests_dir_path(prob_type)
+        self.test_case_files = self.get_test_case_files(tests_dir)
+
+    def get_test_files_path(self, test_dir_path):
         test_files = list(map(
-            lambda x: tests_dir + x,
-            sorted(os.listdir(tests_dir))))
+            lambda x: test_dir_path + x,
+            sorted(os.listdir(test_dir_path))))
+        return test_files
+
+    def get_test_case_files(self, test_dir_path):
+        test_files = self.get_test_files_path(test_dir_path)
         in_files = test_files[0::2]
         out_files = test_files[1::2]
         TestCase = namedtuple('TestCase', ['input', 'output'])
-        self.test_case_files = [TestCase(*test_case)
-                                for test_case in zip(in_files, out_files)]
+        test_case_files = [TestCase(*test_case) for test_case in zip(in_files, out_files)]
+        return test_case_files
 
     def test_all(self, diff: float = None, verbose: bool = False) -> bool:
         """全てのテストスイートを実行し, 結果を返す.
