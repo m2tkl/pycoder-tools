@@ -37,15 +37,6 @@ def setup_test_files(tmpdir):
     tmpfile_00out.remove()
     tmpfile_01in.remove()
     tmpfile_01out.remove()
-    """
-    本来は自動で過去のtmpdirが削除されるようだが、
-    macOS環境下ではtmpdir下にディレクトリのエイリアスが作成され、
-    tmpdirのclean up時にエイリアスが削除されず、
-    ディレクトリが空でないとのエラーが発生し結果tmpdirが残ったままになる。
-    そのため、明示的に削除を行っている。
-    """
-    tmp_test_dir = str(pathlib.Path(tmpdir).parent) + '/'
-    shutil.rmtree(tmp_test_dir)
 
 @pytest.fixture
 def setup_run_target():
