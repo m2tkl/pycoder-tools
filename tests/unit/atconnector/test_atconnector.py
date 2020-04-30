@@ -63,16 +63,28 @@ class TestAtConnector:
         assert ac.session != None
         assert ac.is_login == False
 
-    def test_get_tasks_url(self):
+    def test_get_tasks_url_normal_contest(self):
         ac = AtConnector()
         actual = ac._get_tasks_url('abc', '123')
         expected = 'https://atcoder.jp/contests/abc123/tasks'
         assert actual == expected
 
-    def test_get_submit_url(self):
+    def test_get_tasks_url_other_contest(self):
+        ac = AtConnector()
+        actual = ac._get_tasks_url('others', 'hoge-con')
+        expected = 'https://atcoder.jp/contests/hoge-con/tasks'
+        assert actual == expected
+
+    def test_get_submit_url_normal_contest(self):
         ac = AtConnector()
         actual = ac._get_submit_url('abc', '123')
         expected = 'https://atcoder.jp/contests/abc123/submit'
+        assert actual == expected
+
+    def test_get_submit_url_other_contest(self):
+        ac = AtConnector()
+        actual = ac._get_submit_url('others', 'hoge-con')
+        expected = 'https://atcoder.jp/contests/hoge-con/submit'
         assert actual == expected
 
     @patch.object(Session, 'get', return_value=MockResponse(200, text='ttext'))

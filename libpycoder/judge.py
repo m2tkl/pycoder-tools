@@ -14,33 +14,41 @@ def read_file(file_path: str) -> str:
 
 class Judge:
     def __init__(self, contest_type, contest_id, prob_type):
-        self.pm = PathManager(contest_type, contest_id)
-        self.test_target = self.pm.get_prob_file_path(prob_type)
-        self.tests_dir = self.pm.get_tests_dir_path(prob_type)
         self.contest_type = contest_type
         self.contest_id = contest_id
         self.prob_type = prob_type
+        pm = PathManager(contest_type, contest_id)
+        self.target_src_path = pm.get_prob_file_path(prob_type)
+        tests_dir = pm.get_tests_dir_path(prob_type)
+        self.test_case_files = self.get_test_case_paths(tests_dir)
 
-        test_files = sorted(os.listdir(self.tests_dir))
+    def get_test_files(self, test_dir_path):
+        test_files = list(map(
+            lambda x: test_dir_path + x,
+            sorted(os.listdir(test_dir_path))))
+        return test_files
+
+    def get_test_case_paths(self, test_dir_path):
+        test_files = self.get_test_files(test_dir_path)
         in_files = test_files[0::2]
         out_files = test_files[1::2]
         TestCase = namedtuple('TestCase', ['input', 'output'])
-        self.test_case_files = [TestCase(*test_case)
-                                for test_case in zip(in_files, out_files)]
+        test_case_files = [TestCase(*test_case) for test_case in zip(in_files, out_files)]
+        return test_case_files
 
     def test_all(self, diff: float = None, verbose: bool = False) -> bool:
         """全てのテストスイートを実行し, 結果を返す.
         @param diff テスト時に誤差を判定に使う場合に指定する.
         @param verbose 結果表示を冗長にする場合Trueを指定する.
+        @return total_result 全てのテストケースに通過すればTrue, そうでなければFalse
         """
         print('test num: {}'.format(len(self.test_case_files)))
         total_result = True
         for test_case_file in self.test_case_files:
-            run_target_path = self.test_target
-            test_input_path = self.tests_dir + test_case_file.input
-            test_output_path = self.tests_dir + test_case_file.output
             result = self.test(
-                run_target_path, test_input_path, test_output_path,
+                self.target_src_path,
+                test_case_file.input,
+                test_case_file.output,
                 diff, verbose)
             total_result &= result
         return total_result
@@ -129,7 +137,7 @@ class Judge:
     def submit(self, lang_type):
         ac = AtConnector()
         ac.init_session()
-        submit_code = read_file(self.test_target)
+        submit_code = read_file(self.target_src_path)
         ac.submit(self.contest_type,
                   self.contest_id,
                   self.prob_type,

@@ -4,11 +4,13 @@ REVERCE = '\033[07m'
 END = '\033[0m'
 BOLD = '\033[1m'
 
+
 def switch(param):
     def value(dic):
         default = dic.get("default")
         return dic.get(param, default)
     return value
+
 
 def paint(s: str, color='', bold=True) -> str:
     """stringを装飾する
@@ -40,13 +42,13 @@ def select_color(color: str) -> str:
     @return color-code 色のコード
     """
     color_code = switch(color)({
-            'black': '\033[30m',
-            'red': '\033[31m',
-            'green': '\033[32m',
-            'yellow': '\033[33m',
-            'blue': '\033[34m',
-            'purple': '\033[35m',
-            'cyan': '\033[36m',
-            'white': '\033[37m',
-            'default': ''})
+        'black': '\033[30m',
+        'red': '\033[31m',
+        'green': '\033[32m',
+        'yellow': '\033[33m',
+        'blue': '\033[34m',
+        'purple': '\033[35m',
+        'cyan': '\033[36m',
+        'white': '\033[37m',
+        'default': ''})
     return color_code

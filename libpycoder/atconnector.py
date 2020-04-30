@@ -1,10 +1,9 @@
 import importlib
 import requests
 import sys
-from .atscraper import extract_task_screen_name
-from .atscraper import extract_csrf_token
-from .atscraper import extract_prob_links
-from .langs import get_lang_ids
+from typing import Dict
+from . import atscraper
+from . import langs
 from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
@@ -43,11 +42,15 @@ class AtConnector:
             print("Login failed...")
             exit(1)
 
-    def get_csrf_token(self, url):
+    def get_csrf_token(self, url: str) -> str:
+        """csrfトークンを取得する.
+        @param url csrfトークンを取得したいページのurl
+        @return csrf_token csrfトークン
+        """
         res = self.session.get(url)
         res.raise_for_status()
         html = res.text
-        csrf_token = extract_csrf_token(html)
+        csrf_token = atscraper.extract_csrf_token(html)
         return csrf_token
 
     def post(self, url, data=None):
@@ -57,38 +60,84 @@ class AtConnector:
     def get(self, url):
         return self.session.get(url)
 
-    def get_task_screen_name(self, contest_type, contest_id, prob_type):
-        html = self._get_contest_tasks_page(contest_type, contest_id)
-        task_screen_name = extract_task_screen_name(html, prob_type)
-        return task_screen_name
-
-    def get_prob_urls(self, contest_type, contest_id):
-        """コンテスト問題一覧ページから各問題のurlを取得して返す
-        Args:
-            contest_type: abc, arc, agc, ...
-            contest_id: 123, ...
-        Returns:
-            prob_links: 各問題へのurlを持つ辞書
+    def get_task_screen_name(
+            self,
+            contest_type: str,
+            contest_id: str,
+            prob_type: str) -> str:
+        """
+        @param contest_type コンテストの種類(abc, arc, ...)
+        @param contest_id コンテスト番号
+        @param prob_type 問題の種類(a, b, c, d, ...)
+        @return task_screen_name
         """
         html = self._get_contest_tasks_page(contest_type, contest_id)
-        prob_links = extract_prob_links(html)
+        task_screen_name = atscraper.extract_task_screen_name(html, prob_type)
+        return task_screen_name
+
+    def get_prob_urls(
+            self,
+            contest_type: str,
+            contest_id: str) -> Dict[str, str]:
+        """コンテスト問題一覧ページから各問題のurlを取得して返す
+        @param contest_type abc, arc, agc, ...
+        @param contest_id 123, ...
+        @return prob_links 各問題へのurlを持つdict
+        """
+        html = self._get_contest_tasks_page(contest_type, contest_id)
+        prob_links = atscraper.extract_prob_links(html)
         for prob_type, link in prob_links.items():
             prob_links[prob_type] = ATCODER_URL + link
         return prob_links
 
-    def _get_contest_tasks_page(self, contest_type, contest_id):
+    def _get_contest_tasks_page(
+            self,
+            contest_type: str,
+            contest_id: str) -> str:
+        """問題一覧ページのhtmlを取得する.
+        @param contest_type コンテストのタイプ(abc, arc, ...)
+        @param contest_id コンテスト番号
+        @return html 問題一覧ページのhtml
+        """
         tasks_url = self._get_tasks_url(contest_type, contest_id)
         res = self.get(tasks_url)
         html = res.text
         return html
 
-    def _get_tasks_url(self, contest_type, contest_id):
+    def _get_tasks_url(self, contest_type: str, contest_id: str) -> str:
+        """問題一覧ページのurlを返す.
+        @param contest_type コンテストのタイプ(abc, arc, ...)
+        @param contest_id コンテスト番号
+        @return 問題一覧ページのurl
+        """
+        if contest_type == 'others':
+            return CONTEST_URL + contest_id + '/tasks'
         return CONTEST_URL + contest_type + contest_id + '/tasks'
 
-    def _get_submit_url(self, contest_type, contest_id):
+    def _get_submit_url(self, contest_type: str, contest_id: str) -> str:
+        """提出ページのurlを返す.
+        @param contest_type コンテストのタイプ(abc, arc, ...)
+        @param contest_id コンテスト番号
+        @return 提出ページのurl
+        """
+        if contest_type == 'others':
+            return CONTEST_URL + contest_id + '/submit'
         return CONTEST_URL + contest_type + contest_id + '/submit'
 
-    def submit(self, contest_type, contest_id, prob_type, src, lang_type):
+    def submit(
+            self,
+            contest_type: str,
+            contest_id: str,
+            prob_type: str,
+            src: str,
+            lang_type: str) -> None:
+        """ソースコードを提出する.
+        @param contest_type コンテストのタイプ(abc, arc, ...)
+        @param contest_id コンテスト番号
+        @param prob_type 問題のタイプ(a, b, c, d, ...)
+        @param src 提出コード
+        @param lang_type 提出言語
+        """
         if not self.is_login:
             print('Cannot submit because you are not logged in...')
             exit(1)
@@ -97,7 +146,9 @@ class AtConnector:
         task_screen_name = self.get_task_screen_name(contest_type,
                                                      contest_id,
                                                      prob_type)
-        lang_ids = get_lang_ids(lang_type)
+        lang_ids = langs.get_lang_ids(lang_type)
+        # language updateにより言語Idがコンテストによって異なる
+        # 場合があるため、それぞれのIdで提出を試みる
         for lang_id in lang_ids:
             submit_info = {"data.TaskScreenName": task_screen_name,
                            "csrf_token": csrf_token,
