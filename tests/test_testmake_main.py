@@ -6,6 +6,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 from libpycoder.testmake import TestMaker
 import maketest
 
+@pytest.mark.skip(reason='pytestskip')
 @patch.object(TestMaker, 'fetch_sample_cases', return_value=0)
 def test_fetch_sample_cases(mock_func):
     sys.argv.append('abc')

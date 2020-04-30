@@ -110,6 +110,8 @@ class AtConnector:
         @param contest_id コンテスト番号
         @return 問題一覧ページのurl
         """
+        if contest_type == 'others':
+            return CONTEST_URL + contest_id + '/tasks'
         return CONTEST_URL + contest_type + contest_id + '/tasks'
 
     def _get_submit_url(self, contest_type: str, contest_id: str) -> str:
@@ -118,6 +120,8 @@ class AtConnector:
         @param contest_id コンテスト番号
         @return 提出ページのurl
         """
+        if contest_type == 'others':
+            return CONTEST_URL + contest_id + '/submit'
         return CONTEST_URL + contest_type + contest_id + '/submit'
 
     def submit(
