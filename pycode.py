@@ -23,5 +23,5 @@ if __name__ == '__main__':
     command_dir = ['python', 'makedir.py', contest_type, contest_id]
     subprocess.run(' '.join(command_dir), shell=True)
 
-    command_test = ['python', 'testmake.py', contest_type, contest_id]
+    command_test = ['python', 'maketest.py', contest_type, contest_id]
     subprocess.run(' '.join(command_test), shell=True)

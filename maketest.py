@@ -1,8 +1,7 @@
 from libpycoder.testmake import TestMaker
 from argparse import ArgumentParser
 
-if __name__ == '__main__':
-
+def main():
     example = """
     ex1: abc134のテストケースを取得
         python {0} abc 134
@@ -28,3 +27,7 @@ if __name__ == '__main__':
         tm.fetch_sample_cases()
     else:
         tm.add_test_case(args.add)
+
+
+if __name__ == '__main__':
+    main()
