@@ -4,12 +4,20 @@ from .atconnector import AtConnector
 from .pathmanager import PathManager
 from utils.pycolor import pprint
 from collections import namedtuple
-
+from typing import Optional
+from enum import Enum, auto
 
 def read_file(file_path: str) -> str:
     with open(file_path, 'r') as f:
         content = f.read().rstrip()
     return content
+
+
+class Result(Enum):
+    OK = auto()
+    NG = auto()
+    TLE = auto()
+    RE = auto()
 
 
 class Judge:
@@ -54,9 +62,12 @@ class Judge:
         return total_result
 
     def test(
-            self, run_target_path,
-            test_input_path, test_output_path,
-            diff: float = None, verbose: bool = False) -> bool:
+            self,
+            run_target_path,
+            test_input_path,
+            test_output_path,
+            diff: float = None,
+            verbose: bool = False) -> bool:
         """テストケースを実行し,結果を返す.
         @param run_target_path テスト対象プログラムのpath
         @param test_input_path テストの入力
@@ -65,13 +76,25 @@ class Judge:
         @param verbose 詳細結果表示オプション
         @return result 判定結果
         """
-        actual = self.run_program(run_target_path, test_input_path)
-        expected = read_file(test_output_path)
-        result = self.judge(actual, expected, diff)
-        self.print_result(result, test_input_path, actual, expected, verbose)
-        return result
+        res, actual = self.run_program(
+            run_target_path,
+            test_input_path,
+            test_output_path,
+            diff)
+        self.print_result(
+            res,
+            test_input_path,
+            test_output_path,
+            actual,
+            verbose)
+        return res == Result.OK
 
-    def run_program(self, target: str, target_input: str) -> str:
+    def run_program(
+                self,
+                target: str,
+                target_input: str,
+                target_output: str,
+                diff: float) -> Optional[str]:
         """targetプログラムに入力を与え,実行結果(出力)を返す.
         @param target 実行対象プログラムのpath
         @param target_input 入力ファイルのpath
@@ -79,10 +102,25 @@ class Judge:
         """
         # ex: python /hoge/ABC/134/A.py < /hoge/ABC/134/tests/A/00_input.txt
         command = ' '.join(['python', target, '<', target_input])
-        std = subprocess.run(command, stdout=subprocess.PIPE,
-                             stderr=subprocess.STDOUT, shell=True)
-        res = std.stdout.decode('utf-8').rstrip()
-        return res
+        try:
+            std = subprocess.run(
+                command,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                timeout=0.5,
+                shell=True,
+                check=True)
+        except subprocess.TimeoutExpired:
+            res = Result.TLE
+            actual_output = None
+        except subprocess.CalledProcessError as e:
+            res = Result.RE
+            actual_output = e.output.decode('utf-8').rstrip()
+        else:
+            actual_output = std.stdout.decode('utf-8').rstrip()
+            expected_output = read_file(target_output)
+            res = self.judge(actual_output, expected_output, diff)
+        return (res, actual_output)
 
     def judge(self, actual: str, expected: str, diff: float = None):
         """正誤判定を行う.
@@ -92,15 +130,19 @@ class Judge:
         @return 正解ならばTrue, 不正解ならばFalse
         """
         if diff is not None:
-            return abs(float(expected) - float(actual)) < diff
+            if abs(float(expected) - float(actual)) < diff:
+                return Result.OK
         else:
-            return actual == expected
+            if actual == expected:
+                return Result.OK
+        return Result.NG
 
     def print_result(
             self,
             result: bool,
             input_file,
-            actual, expected,
+            output_file,
+            actual,
             verbose: bool = None):
         """テスト実行結果の表示を行う.
         @param result 正誤判定
@@ -109,30 +151,35 @@ class Judge:
         @param expected 期待される出力
         @param verbose Trueの場合,正誤判定だけでなく,入出力の値も表示する
         """
-        # どのテストケースであるかを表示する.
         prefix = input_file.split('/')[-1][:2]
-        if prefix[0] == '0':
-            pprint('sample_case' + prefix + ' => ', end='', bold=True)
-        else:
-            pprint('additional_case' + prefix + ' => ', end='', bold=True)
+        pprint(prefix + '_test_case' + ' => ', end='', bold=True)
 
         # 結果(OK or NG)の表示
-        if result:
-            pprint('OK', color='green')
-        else:
-            pprint('NG', color='red')
+        result_color = 'green' if result == Result.OK else 'red'
+        pprint('{}'.format(result.name), color=result_color)
 
-        # verboseオプションありの場合は, 入出力を表示する.
         if verbose:
             input_val = read_file(input_file)
-            print('[input]\n{}'.format(input_val))
-            if result:
-                print('[output]\n{}'.format(actual))
-
-        # 不正解の場合はverboseオプションに関わらず出力を表示する.
-        if not result:
-            pprint('[expected]\n{}'.format(expected), color='green')
-            pprint('[actual]\n{}'.format(actual), color='red')
+            expected = read_file(output_file)
+            if result == Result.OK:
+                pprint('[input]', color='cyan')
+                print(input_val)
+                pprint('[output]', color='cyan')
+                print(actual)
+                print()
+            if result == Result.NG:
+                pprint('[expected]', color='green')
+                pprint(expected, color='green', bold=False)
+                pprint('[actual]', color='red')
+                pprint(actual, color='red', bold=False)
+                print()
+            if result == Result.RE:
+                pprint(actual, color='red', bold=False)
+                print()
+            if result == Result.TLE:
+                pprint('[input]', color='red')
+                pprint(input_val, color='red', bold=False)
+                print()
 
     def submit(self, lang_type):
         ac = AtConnector()
