@@ -4,11 +4,18 @@ from pathlib import Path
 import importlib
 from unittest.mock import patch
 from unittest.mock import MagicMock
+from enum import Enum, auto
 import pytest
 sys.path.append(str(Path(__file__).resolve().parent.parent.parent))
 
 from libpycoder.judge import Judge
 from libpycoder import judge
+
+class Result(Enum):
+    OK = auto()
+    NG = auto()
+    TLE = auto()
+    RE = auto()
 
 class TestJudge:
     def test_init(self, setup):
@@ -88,17 +95,17 @@ class TestJudge:
         judge_obj = Judge('abc', '123', 'a')
         expected_output = '1 2 3'
         actual_output = '1 2 3'
-        assert judge_obj.judge(expected_output, actual_output) == True
+        assert judge_obj.judge(expected_output, actual_output).name == Result.OK.name
 
         wrong_output = '11 22 33'
-        assert judge_obj.judge(expected_output, wrong_output) == False
+        assert judge_obj.judge(expected_output, wrong_output).name == Result.NG.name
 
     def test_judge_diff(self, setup):
         judge_obj = Judge('abc', '123', 'a')
         expected_output = 0.000011
         actual_output = 0.00001
-        assert judge_obj.judge(expected_output, actual_output, diff=1e-6) == True
-        assert judge_obj.judge(expected_output, actual_output, diff=1e-7) == False
+        assert judge_obj.judge(expected_output, actual_output, diff=1e-6).name == Result.OK.name
+        assert judge_obj.judge(expected_output, actual_output, diff=1e-7).name == Result.NG.name
 
     @pytest.mark.skip(reason='pytestskip')
     def test_print_result(self):
