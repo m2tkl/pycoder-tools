@@ -76,7 +76,7 @@ class Judge:
         @param verbose 詳細結果表示オプション
         @return result 判定結果
         """
-        res, actual = self.run_program(
+        res, actual = self.run_test(
             run_target_path,
             test_input_path,
             test_output_path,
@@ -89,25 +89,24 @@ class Judge:
             verbose)
         return res == Result.OK
 
-    def run_program(
+    def run_test(
                 self,
                 target: str,
-                target_input: str,
-                target_output: str,
+                input_path: str,
+                output_path: str,
                 diff: float) -> Optional[str]:
         """targetプログラムに入力を与え,実行結果(出力)を返す.
         @param target 実行対象プログラムのpath
         @param target_input 入力ファイルのpath
         @return res 実行結果(出力)
         """
-        # ex: python /hoge/ABC/134/A.py < /hoge/ABC/134/tests/A/00_input.txt
-        command = ' '.join(['python', target, '<', target_input])
+        command = ' '.join(['python', target, '<', input_path])
         try:
             std = subprocess.run(
                 command,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
-                timeout=0.5,
+                timeout=2.5,
                 shell=True,
                 check=True)
         except subprocess.TimeoutExpired:
@@ -118,7 +117,7 @@ class Judge:
             actual_output = e.output.decode('utf-8').rstrip()
         else:
             actual_output = std.stdout.decode('utf-8').rstrip()
-            expected_output = read_file(target_output)
+            expected_output = read_file(output_path)
             res = self.judge(actual_output, expected_output, diff)
         return (res, actual_output)
 
@@ -129,12 +128,11 @@ class Judge:
         @param diff 指定された場合は誤差を正誤判定に用いる.
         @return 正解ならばTrue, 不正解ならばFalse
         """
-        if diff is not None:
+        if diff:
             if abs(float(expected) - float(actual)) < diff:
                 return Result.OK
-        else:
-            if actual == expected:
-                return Result.OK
+        if actual == expected:
+            return Result.OK
         return Result.NG
 
     def print_result(
