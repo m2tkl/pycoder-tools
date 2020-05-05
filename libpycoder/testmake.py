@@ -19,7 +19,6 @@ class TestMaker():
         prob_urls = ac.get_prob_urls(self.contest_type, self.contest_id)
         problems = ('a', 'b', 'c', 'd', 'e', 'f')
         for p in problems:
-            print('*', end='')
             url = prob_urls[p]
             if url == '':
                 continue
@@ -28,13 +27,22 @@ class TestMaker():
             sample_test_cases = extract_sample_test_cases_from_prob_page(
                 res.text)
             file_dir = self.pm.get_tests_dir_path(p)
+            print('{} => '.format(p), end='')
+            is_exist_sample_calse = True
             for idx, sample_case in sample_test_cases.items():
+                if sample_case is None:
+                    is_exist_sample_calse = False
+                    break
                 iname = '0' + str(idx) + '_input.txt'
                 oname = '0' + str(idx) + '_output.txt'
                 with open(file_dir + iname, 'w') as f:
                     f.write(sample_case.input)
                 with open(file_dir + oname, 'w') as f:
                     f.write(sample_case.output)
+            if is_exist_sample_calse:
+                print('o')
+            else:
+                print('x')
         print('\nDone!')
 
     def add_test_case(self, problem_type):
