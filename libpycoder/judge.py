@@ -61,6 +61,19 @@ class Judge:
             total_result &= result
         return total_result
 
+    def test_debug(self, test_case_prefix: str):
+        test_case_file = None
+        for tc in self.test_case_files:
+            if tc.input.split('/')[-1][:2] == test_case_prefix:
+                test_case_file = tc
+                break
+        result = self.test(
+            self.target_src_path,
+            test_case_file.input,
+            test_case_file.output,
+            None, True,
+        )
+
     def test(
             self,
             run_target_path,
@@ -159,9 +172,9 @@ class Judge:
         if verbose:
             input_val = read_file(input_file)
             expected = read_file(output_file)
+            pprint('[input]', color='cyan')
+            print(input_val)
             if result == Result.OK:
-                pprint('[input]', color='cyan')
-                print(input_val)
                 pprint('[output]', color='cyan')
                 print(actual)
                 print()
