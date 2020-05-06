@@ -77,6 +77,9 @@ def extract_sample_test_cases_from_prob_page(html: str) \
     TestCase = namedtuple('TestCase', ['input', 'output'])
     sample_test_cases = {}
     for i in range(0, len(io_samples), 2):
-        sample_test_cases[i//2] = TestCase(io_samples[i].get_text(),
-                                           io_samples[i+1].get_text())
+        try:
+            sample_test_cases[i//2] = TestCase(io_samples[i].get_text(),
+                                               io_samples[i+1].get_text())
+        except IndexError:
+            sample_test_cases[i//2] = None
     return sample_test_cases

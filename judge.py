@@ -1,18 +1,20 @@
 from libpycoder.judge import Judge
 from argparse import ArgumentParser
 
-if __name__ == '__main__':
+def main():
     example = """
     ex1: abc123のd問題をテスト
         python {0} abc 123 d
     ex2: abc123のa問題をテスト（差が1e-6以内かどうか）
-        python {0} abc 123 a -d 1e-6e
+        python {0} abc 123 a -e 1e-6e
     ex3: abc123のa問題がテスト通過したら提出（python3）
         python {0} abc 123 a -s p
     ex4: abc123のa問題がテスト通過したら提出（pypy3）
         python {0} abc 123 a -s pp
     ex5: テストの成否を無視して提出
         python {0} abc 123 a -s p -f
+    ex6: 特定のテストのみを実行
+        python {0} abc 123 a -d 01
     """.format(__file__)
 
     argparser = ArgumentParser(usage=example)
@@ -28,7 +30,7 @@ if __name__ == '__main__':
     argparser.add_argument('-v', '--verbose',
                            action='store_true',
                            help='各テストケースの入力、出力を表示')
-    argparser.add_argument('-d', '--diff',
+    argparser.add_argument('-e', '--error',
                            type=float,
                            help='出力誤差の値を判定')
     argparser.add_argument('-s', '--submit',
@@ -38,6 +40,9 @@ if __name__ == '__main__':
     argparser.add_argument('-f', '--force',
                            action='store_true',
                            help='テストの成否を無視して強制的に提出する')
+    argparser.add_argument('-d', '--debug',
+                           type=str,
+                           help='テストケースのprefix')
 
     args = argparser.parse_args()
 
@@ -45,7 +50,14 @@ if __name__ == '__main__':
                   args.contest_id,
                   args.problem_type)
 
-    result = judge.test_all(verbose=args.verbose, diff=args.diff)
+    if not args.debug:
+        result = judge.test_all(verbose=args.verbose, diff=args.error)
+    else:
+        judge.test_debug(args.debug)
+        return None
 
     if (result or args.force) and args.submit:
         judge.submit(args.submit)
+
+if __name__ == '__main__':
+    main()
