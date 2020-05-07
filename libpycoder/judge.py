@@ -185,11 +185,10 @@ class Judge:
                 pprint(actual, color='red', bold=False)
                 print()
             if result == Result.RE:
+                pprint('[output]', color='red')
                 pprint(actual, color='red', bold=False)
                 print()
             if result == Result.TLE:
-                pprint('[input]', color='red')
-                pprint(input_val, color='red', bold=False)
                 print()
 
     def submit(self, lang_type):
