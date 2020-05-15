@@ -21,15 +21,15 @@ class TestJudge:
     def test_init(self, setup):
         judge_obj = Judge('abc', '123', 'a')
         # 判定対象のファイルパスをチェック
-        expected = '/Users/hoge/atcoder/ABC/123/A.py'
+        expected = '/Users/hoge/atcoder/abc/123/A.py'
         actual = judge_obj.target_src_path
         assert actual == expected
 
         # テストスイートのパスをチェック
-        expected = [('/Users/hoge/atcoder/ABC/123/tests/A/00_input.txt',
-                    '/Users/hoge/atcoder/ABC/123/tests/A/00_output.txt'),
-                    ('/Users/hoge/atcoder/ABC/123/tests/A/01_input.txt',
-                    '/Users/hoge/atcoder/ABC/123/tests/A/01_output.txt')]
+        expected = [('/Users/hoge/atcoder/abc/123/tests/A/00_input.txt',
+                    '/Users/hoge/atcoder/abc/123/tests/A/00_output.txt'),
+                    ('/Users/hoge/atcoder/abc/123/tests/A/01_input.txt',
+                    '/Users/hoge/atcoder/abc/123/tests/A/01_output.txt')]
         actual = judge_obj.test_case_files
         assert actual[0][0] == expected[0][0]
         assert actual[0][1] == expected[0][1]
