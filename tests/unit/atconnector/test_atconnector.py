@@ -87,6 +87,18 @@ class TestAtConnector:
         expected = 'https://atcoder.jp/contests/hoge-con/submit'
         assert actual == expected
 
+    def test_get_submission_result_url_for_normal_contest(self):
+        ac = AtConnector()
+        actual = ac._get_submission_result_url('abc', '123')
+        expected = 'https://atcoder.jp/contests/abc123/submissions/me'
+        assert actual == expected
+
+    def test_get_submission_result_url_for_other_contest(self):
+        ac = AtConnector()
+        actual = ac._get_submission_result_url('others', 'hoge-con')
+        expected = 'https://atcoder.jp/contests/hoge-con/submissions/me'
+        assert actual == expected
+
     @patch.object(Session, 'get', return_value=MockResponse(200, text='ttext'))
     def test_get_contest_tasks_page(self, mock_response):
         ac = AtConnector()

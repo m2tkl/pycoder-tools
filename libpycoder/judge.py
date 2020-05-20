@@ -7,6 +7,7 @@ from collections import namedtuple
 from typing import Optional
 from enum import Enum, auto
 
+
 def read_file(file_path: str) -> str:
     with open(file_path, 'r') as f:
         content = f.read().rstrip()
@@ -41,7 +42,8 @@ class Judge:
         in_files = test_files[0::2]
         out_files = test_files[1::2]
         TestCase = namedtuple('TestCase', ['input', 'output'])
-        test_case_files = [TestCase(*test_case) for test_case in zip(in_files, out_files)]
+        test_case_files = [TestCase(*test_case)
+                           for test_case in zip(in_files, out_files)]
         return test_case_files
 
     def test_all(self, diff: float = None, verbose: bool = False) -> bool:
@@ -103,11 +105,11 @@ class Judge:
         return res == Result.OK
 
     def run_test(
-                self,
-                target: str,
-                input_path: str,
-                output_path: str,
-                diff: float) -> Optional[str]:
+            self,
+            target: str,
+            input_path: str,
+            output_path: str,
+            diff: float) -> Optional[str]:
         """targetプログラムに入力を与え,実行結果(出力)を返す.
         @param target 実行対象プログラムのpath
         @param target_input 入力ファイルのpath
@@ -200,3 +202,4 @@ class Judge:
                   self.prob_type,
                   submit_code,
                   lang_type)
+        ac.open_submission_page(self.contest_type, self.contest_id)

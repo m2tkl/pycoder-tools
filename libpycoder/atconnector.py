@@ -1,6 +1,7 @@
 import importlib
 import requests
 import sys
+import webbrowser
 from typing import Dict
 from . import atscraper
 from . import langs
@@ -114,6 +115,16 @@ class AtConnector:
             return CONTEST_URL + contest_id + '/tasks'
         return CONTEST_URL + contest_type + contest_id + '/tasks'
 
+    def _get_submission_result_url(self, contest_type, contest_id):
+        """提出結果ページのurlを返す
+        @param contest_type コンテストのタイプ
+        @param contest_id コンテストの番号
+        @return 提出結果ページのurl
+        """
+        if contest_type == 'others':
+            return CONTEST_URL + contest_id + '/submissions/me'
+        return CONTEST_URL + contest_type + contest_id + '/submissions/me'
+
     def _get_submit_url(self, contest_type: str, contest_id: str) -> str:
         """提出ページのurlを返す.
         @param contest_type コンテストのタイプ(abc, arc, ...)
@@ -168,3 +179,12 @@ class AtConnector:
         else:
             print('cannot submit...')
             exit(1)
+
+    def open_submission_page(self, contest_type, contest_id):
+        """引数で指定したコンテストの提出結果ページを開く
+        @param contest_type コンテストのタイプ
+        @param contest_id コンテスト番号
+        """
+        result_page_url = self._get_submission_result_url(
+            contest_type, contest_id)
+        webbrowser.open(result_page_url)

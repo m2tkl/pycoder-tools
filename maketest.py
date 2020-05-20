@@ -1,6 +1,7 @@
 from libpycoder.testmake import TestMaker
 from argparse import ArgumentParser
 
+
 def main():
     example = """
     ex1: abc134のテストケースを取得
