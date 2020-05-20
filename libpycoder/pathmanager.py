@@ -26,7 +26,7 @@ class PathManager:
             res = root_path
         else:
             res = './'
-        res += self.contest_type.upper() + '/' + self.contest_id + '/'
+        res += self.contest_type + '/' + self.contest_id + '/'
         PathManager.ATCODER_DIR = res
 
     def get_prob_url(self, prob_type):

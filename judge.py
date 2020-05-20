@@ -1,6 +1,7 @@
 from libpycoder.judge import Judge
 from argparse import ArgumentParser
 
+
 def main():
     example = """
     ex1: abc123のd問題をテスト
@@ -58,6 +59,7 @@ def main():
 
     if (result or args.force) and args.submit:
         judge.submit(args.submit)
+
 
 if __name__ == '__main__':
     main()

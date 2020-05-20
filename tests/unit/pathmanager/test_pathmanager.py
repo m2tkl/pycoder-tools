@@ -22,7 +22,7 @@ class TestPathManager:
         pm = setup_obj
         pm._set_atcoder_dir_path(root_path)
         actual = pm.ATCODER_DIR
-        expected = './ABC/123/'
+        expected = './abc/123/'
         assert actual == expected
 
     def test_get_atcoder_dir_path_with_confing_path(self, setup_obj):
@@ -34,7 +34,7 @@ class TestPathManager:
         pm = setup_obj
         pm._set_atcoder_dir_path(root_path)
         actual = pm.ATCODER_DIR
-        expected = root_path + 'ABC/123/'
+        expected = root_path + 'abc/123/'
         assert actual == expected
 
     def test_get_prob_url(self, setup_obj):
@@ -54,12 +54,12 @@ class TestPathManager:
         pm = setup_obj
         prob_type = 'a'
         actual = pm.get_prob_file_path(prob_type)
-        expected = root_path + 'ABC/123/' + 'A' + '.py'
+        expected = root_path + 'abc/123/' + 'A' + '.py'
         assert actual == expected
 
     def test_get_dir_path(self, setup_obj):
         prob_type = 'a'
         pm = setup_obj
         actual = pm.get_tests_dir_path(prob_type)
-        expected = root_path + 'ABC/123/' + 'tests/' + 'A' + '/'
+        expected = root_path + 'abc/123/' + 'tests/' + 'A' + '/'
         assert actual == expected
