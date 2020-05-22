@@ -49,8 +49,9 @@ def extract_prob_links(html: str) -> Dict[str, str]:
     return prob_links
 
 
-def extract_sample_test_cases_from_prob_page(html: str) \
-        -> Dict[int, Tuple[str, str]]:
+def extract_sample_test_cases_from_prob_page(
+        html: str
+    ) -> Dict[int, Tuple[str, str]]:
     """問題ページからサンプルテストケースを抽出する.
     @param html 問題ページ
     @return 問題ページのサンプルテストケース.
@@ -66,20 +67,21 @@ def extract_sample_test_cases_from_prob_page(html: str) \
 
     io_samples = []
     for sec in soup.find_all('section'):
+        if sec.find('h3').get_text() == '問題文':
+            continue
         # section内の先頭以外のpreは'間違いの例'などサンプルケースでないことがあるため、
         # 先頭のpreのみを取得する
         pre = sec.find('pre')
-        # 問題文もsection内にあるが、問題文にはpreタグは存在しない.
         if pre is None:
             continue
-        io_samples.append(pre)
+        io_samples.append(pre.get_text())
 
     TestCase = namedtuple('TestCase', ['input', 'output'])
     sample_test_cases = {}
     for i in range(0, len(io_samples), 2):
         try:
-            sample_test_cases[i//2] = TestCase(io_samples[i].get_text(),
-                                               io_samples[i+1].get_text())
+            sample_test_cases[i//2] = TestCase(io_samples[i],
+                                               io_samples[i+1])
         except IndexError:
             sample_test_cases[i//2] = None
     return sample_test_cases
