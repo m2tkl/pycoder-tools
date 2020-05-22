@@ -1,10 +1,13 @@
-import subprocess
+from libpycoder.testmake import TestMaker
 from argparse import ArgumentParser
 
-if __name__ == '__main__':
+
+def main():
     example = """
-    ex: abc134の準備
+    ex1: abc134の準備
         python {0} abc 134
+    ex2: abc134のB問題にテストケースを追加
+        python {0} abc 134 -a b
     """.format(__file__)
 
     argparser = ArgumentParser(usage=example)
@@ -14,14 +17,18 @@ if __name__ == '__main__':
     argparser.add_argument('contest_id',
                            type=str,
                            help='コンテスト番号')
+    argparser.add_argument('-a', '--add',
+                           type=str,
+                           help='テストケースの追加')
 
     args = argparser.parse_args()
 
-    contest_type = args.contest_type
-    contest_id = args.contest_id
+    tm = TestMaker(args.contest_type, args.contest_id)
+    if not args.add:
+        tm.fetch_sample_cases()
+    else:
+        tm.add_test_case(args.add)
 
-    command_dir = ['python', 'makedir.py', contest_type, contest_id]
-    subprocess.run(' '.join(command_dir), shell=True)
 
-    command_test = ['python', 'maketest.py', contest_type, contest_id]
-    subprocess.run(' '.join(command_test), shell=True)
+if __name__ == '__main__':
+    main()
