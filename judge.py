@@ -19,12 +19,9 @@ def main():
     """.format(__file__)
 
     argparser = ArgumentParser(usage=example)
-    argparser.add_argument('contest_type',
-                           type=str,
-                           help='コンテストの種類')
     argparser.add_argument('contest_id',
                            type=str,
-                           help='コンテスト番号')
+                           help='コンテストID')
     argparser.add_argument('problem_type',
                            type=str,
                            help='テスト対象の問題指定(a ~ f)')
@@ -47,8 +44,15 @@ def main():
 
     args = argparser.parse_args()
 
-    judge = Judge(args.contest_type,
-                  args.contest_id,
+    if args.contest_id[:3] == 'abc' or 'arc' or 'agc':
+        contest_type = args.contest_id[:3]
+        contest_id = args.contest_id[3:]
+    else:
+        contest_type = 'others'
+        contest_id = args.contest_id
+
+    judge = Judge(contest_type,
+                  contest_id,
                   args.problem_type)
 
     if not args.debug:

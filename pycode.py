@@ -11,19 +11,28 @@ def main():
     """.format(__file__)
 
     argparser = ArgumentParser(usage=example)
-    argparser.add_argument('contest_type',
-                           type=str,
-                           help='コンテストの種類')
+    # argparser.add_argument('contest_type',
+    #                        type=str,
+    #                        help='コンテストの種類')
     argparser.add_argument('contest_id',
                            type=str,
-                           help='コンテスト番号')
+                           help='コンテストID')
     argparser.add_argument('-a', '--add',
                            type=str,
                            help='テストケースの追加')
 
     args = argparser.parse_args()
 
-    tm = TestMaker(args.contest_type, args.contest_id)
+    contest = args.contest_id[:3]
+    if contest == 'abc' or contest == 'arc' or  contest == 'agc':
+        print('hoge')
+        contest_type = args.contest_id[:3]
+        contest_id = args.contest_id[3:]
+    else:
+        contest_type = 'others'
+        contest_id = args.contest_id
+
+    tm = TestMaker(contest_type, contest_id)
     if not args.add:
         tm.fetch_sample_cases()
     else:
