@@ -40,7 +40,7 @@ def extract_prob_links(html: str) -> Dict[str, str]:
     @return prob_links 各問題のパス
     """
     soup = bs(html, 'html5lib')
-    prob_links = {'a': '', 'b': '', 'c': '', 'd': '', 'e': '', 'f': '', }
+    prob_links = {}
     for tr in soup.find('tbody').find_all('tr'):
         item = tr.find('td').find('a')
         p_type = item.contents[0].lower()
