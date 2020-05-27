@@ -115,15 +115,16 @@ class Judge:
         @param target_input 入力ファイルのpath
         @return res 実行結果(出力)
         """
-        command = ' '.join(['python', target, '<', input_path])
         try:
-            std = subprocess.run(
-                command,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                timeout=2.5,
-                shell=True,
-                check=True)
+            with open(input_path, 'r') as f:
+                std = subprocess.run(
+                    ['python', target],
+                    stdin=f,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    timeout=2.0,
+                    shell=False,
+                    check=True)
         except subprocess.TimeoutExpired:
             res = Result.TLE
             actual_output = None
