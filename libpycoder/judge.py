@@ -112,7 +112,8 @@ class Judge:
             diff: float) -> Optional[str]:
         """targetプログラムに入力を与え,実行結果(出力)を返す.
         @param target 実行対象プログラムのpath
-        @param target_input 入力ファイルのpath
+        @param input_path テスト(入力)ファイルのpath
+        @param output_path テスト(出力)ファイルのpath
         @return res 実行結果(出力)
         """
         try:
