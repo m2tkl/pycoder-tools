@@ -23,9 +23,7 @@ def main():
 
     args = argparser.parse_args()
 
-    contest = args.contest_id[:3]
-    if contest == 'abc' or contest == 'arc' or  contest == 'agc':
-        print('hoge')
+    if args.contest_id[:3] in ['abc','arc','agc']:
         contest_type = args.contest_id[:3]
         contest_id = args.contest_id[3:]
     else:
