@@ -16,6 +16,7 @@ pytest-cov = "*"
 lxml = "*"
 typing = "*"
 numpy = "*"
+pycoder-tools = {editable = true,path = "."}
 
 [requires]
 python_version = "3.6"

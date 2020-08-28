@@ -5,7 +5,13 @@ import webbrowser
 from typing import Dict
 from . import atscraper
 from . import langs
+# import atscraper
+# import langs
+
 from pathlib import Path
+import pickle
+import datetime
+import os
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 config = importlib.import_module('config')
@@ -21,6 +27,36 @@ class AtConnector:
     def __init__(self):
         self.session = None
         self.is_login = False
+        self.maxSessionTime = 30*60
+        self.sessionFile = './hoge'
+
+    def login(self):
+        """
+        """
+        wasReadFromCache = False
+        if os.path.exists(self.sessionFile):
+            print('load cache')
+            time = self.modification_date(self.sessionFile)
+            lastModification = (datetime.datetime.now() - time).seconds
+            if lastModification < self.maxSessionTime:
+                with open(self.sessionFile, 'rb') as f:
+                    self.session = pickle.load(f)
+                    wasReadFromCache = True
+        if not wasReadFromCache:
+            self.init_session()
+            self.saveSessionToCache()
+
+    def logout(self):
+        os.remove(self.sessionFile)
+        self.is_login = False
+
+    def saveSessionToCache(self):
+        with open(self.sessionFile, 'wb') as f:
+            pickle.dump(self.session, f)
+
+    def modification_date(self, filename):
+        t = os.path.getmtime(filename)
+        return datetime.datetime.fromtimestamp(t)
 
     def init_session(self) -> None:
         """セッションをログイン済の状態にする.
@@ -188,3 +224,13 @@ class AtConnector:
         result_page_url = self._get_submission_result_url(
             contest_type, contest_id)
         webbrowser.open(result_page_url)
+
+    def check_login(self):
+        url = CONTEST_URL + 'abc001/submit'
+        res = self.session.get(url, allow_redirects=False)
+        return res.status_code != 302
+
+if __name__ == "__main__":
+    ac = AtConnector()
+    # ac.login()
+    print(ac.check_login())
