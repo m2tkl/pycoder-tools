@@ -197,7 +197,6 @@ class Judge:
 
     def submit(self, lang_type):
         ac = AtConnector()
-        ac.init_session()
         submit_code = read_file(self.target_src_path)
         ac.submit(self.contest_type,
                   self.contest_id,

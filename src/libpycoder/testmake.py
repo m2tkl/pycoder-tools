@@ -21,7 +21,6 @@ class TestMaker():
         """サンプルテストケースを取得し,指定ディレクトリに書き込む.
         """
         ac = AtConnector()
-        ac.init_session()
         prob_urls = ac.get_prob_urls(self.contest_type, self.contest_id)
         self.make_directory(prob_urls.keys())
         for p, url in prob_urls.items():

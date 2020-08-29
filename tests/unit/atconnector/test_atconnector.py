@@ -32,6 +32,8 @@ class TestAtConnector:
         assert res.status_code == 200
         assert res.text == 'test'
 
+    # login処理はatsessionに移行
+    @pytest.mark.skip(reason='pytestskip')
     @patch.object(Session, 'post', return_value=MockResponse(200))
     @patch.object(AtConnector, 'get_csrf_token', return_value='')
     def test_init_atconnector_login_success(self, mock_response, func_mock):
@@ -42,6 +44,8 @@ class TestAtConnector:
         assert ac.session != None
         assert ac.is_login == True
 
+    # login処理はatsessionに移行
+    @pytest.mark.skip(reason='pytestskip')
     @patch.object(Session, 'post', return_value=MockResponse(400))
     @patch.object(AtConnector, 'get_csrf_token', return_value='')
     def test_init_atconnector_login_failed(self, mock_response, func_mock):
@@ -50,16 +54,6 @@ class TestAtConnector:
         assert ac.is_login == False
         with pytest.raises(SystemExit):
             ac.init_session()
-        assert ac.session != None
-        assert ac.is_login == False
-
-    def test_init_atconnector_no_config(self):
-        ac = AtConnector()
-        atconnector.USERNAME = None
-        atconnector.PASSWORD = None
-        assert ac.session == None
-        assert ac.is_login == False
-        ac.init_session()
         assert ac.session != None
         assert ac.is_login == False
 
