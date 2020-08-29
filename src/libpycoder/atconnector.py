@@ -230,6 +230,7 @@ class AtConnector:
         res = self.session.get(url, allow_redirects=False)
         return res.status_code != 302
 
+
 if __name__ == "__main__":
     ac = AtConnector()
     # ac.login()

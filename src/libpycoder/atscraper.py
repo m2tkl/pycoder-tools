@@ -50,8 +50,7 @@ def extract_prob_links(html: str) -> Dict[str, str]:
 
 
 def extract_sample_test_cases_from_prob_page(
-        html: str
-    ) -> Dict[int, Tuple[str, str]]:
+        html: str) -> Dict[int, Tuple[str, str]]:
     """問題ページからサンプルテストケースを抽出する.
     @param html 問題ページ
     @return 問題ページのサンプルテストケース.
