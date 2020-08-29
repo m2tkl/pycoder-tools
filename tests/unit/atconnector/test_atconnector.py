@@ -17,6 +17,7 @@ class MockResponse:
 
 class TestAtConnector:
 
+    @pytest.mark.skip(reason='pytestskip')
     @patch.object(Session, 'post', return_value=MockResponse(200))
     def test_post(self, mock_response):
         ac = AtConnector()
@@ -24,6 +25,7 @@ class TestAtConnector:
         res = ac.post('test_url')
         assert res.status_code == 200
 
+    @pytest.mark.skip(reason='pytestskip')
     @patch.object(Session, 'get', return_value=MockResponse(200, text='test'))
     def test_get(self, mock_response):
         ac = AtConnector()
