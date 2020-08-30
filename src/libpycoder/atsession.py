@@ -15,7 +15,7 @@ class AtSession:
     """
 
     def __init__(self):
-        self.session = None
+        self.session = requests.session()
         self.is_login = False
         self.max_sesison_time = 30*60
         self.session_file = './session.dump'
