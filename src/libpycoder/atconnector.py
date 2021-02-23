@@ -110,7 +110,7 @@ class AtConnector:
         @param lang_type 提出言語
         """
         submit_url = self._get_submit_url(contest_type, contest_id)
-        csrf_token = self.get_csrf_token(submit_url)
+        csrf_token = self.AS.get_csrf_token(submit_url)
         task_screen_name = self.get_task_screen_name(contest_type,
                                                      contest_id,
                                                      prob_type)

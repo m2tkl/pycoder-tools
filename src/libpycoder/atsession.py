@@ -28,9 +28,12 @@ class AtSession:
         """
         use_cache = self.load_cache()
         if use_cache:
-            self.check_status()
+            self.is_login = self.check_status()
         else:
             # 有効なキャッシュがなければ新しくsessionを作る
+            self._init_session()
+            self._save_session_to_cache()
+        if not self.is_login:
             self._init_session()
             self._save_session_to_cache()
 

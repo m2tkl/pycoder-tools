@@ -2,17 +2,25 @@
 import fire
 from . import judge as judgeCmd
 from . import pycode
+from libpycoder.atsession import AtSession
 
 
 class Commands:
 
     @staticmethod
     def login():
-        pass
+        AS = AtSession()
+        AS.login()
 
     @staticmethod
     def logout():
-        pass
+        AS = AtSession()
+        AS.logout()
+
+    @staticmethod
+    def chkin():
+        AS = AtSession()
+        AS.check_status()
 
     @staticmethod
     def contest(contest_id):
@@ -31,7 +39,7 @@ class Commands:
 
     def judge(self, contest_id, prob_type,
               verbose=False, error=None, debug=None,
-              submit=None, force=False,):
+              submit=None, force=False):
         """テストケースの判定を行う
         :param contest_id: コンテストの名前(ex: abc001, hogecon2020)
         :param prob_type: 判定対象の問題(a, b, c, ...)
@@ -41,6 +49,9 @@ class Commands:
         :param force: 提出オプション。テストケースに通過しなくても強制的に提出する
         :param debug: デバッグオプション。指定したテストケースのみを表示しつつ実行
         """
+        # TODO: 00のみ何故か0として受け取ってしまうため変換している（01は01として受け取られている）
+        if debug == 0:
+            debug = '00'
         judgeCmd.judge(contest_id, prob_type,
                        verbose=verbose, error=error, debug=debug,
                        submit=submit, force=force)
@@ -48,6 +59,7 @@ class Commands:
 
 def main():
     fire.Fire(Commands)
+    # fire.Fire(AtSession)
 
 
 if __name__ == '__main__':
