@@ -1,5 +1,33 @@
+#!/usr/bin/env python
 from libpycoder.judge import Judge
 from argparse import ArgumentParser
+from .argutil import split_contest_id
+
+
+def judge(contest_id, prob_type,
+          verbose=False, error=None, debug=None,
+          submit=None, force=False):
+    """テストケースの判定を行う
+    :param contest_id: コンテストの名前(ex: abc001, hogecon2020)
+    :param prob_type: 判定対象の問題(a, b, c, ...)
+    :param verbose: 判定結果だけでなく入出力も表示する
+    :param error: 誤差判定が必要なときに値を指定する
+    :param submit: 提出オプション。すべてのテストケースに通過した場合提出する
+    :param force: 提出オプション。テストケースに通過しなくても強制的に提出する
+    :param debug: デバッグオプション。指定したテストケースのみを表示しつつ実行
+    """
+    contest = split_contest_id(contest_id)
+
+    judge = Judge(contest.type, contest.name, prob_type)
+
+    if not debug:
+        result = judge.test_all(verbose=verbose, diff=error)
+    else:
+        judge.test_debug(debug)
+        return None
+
+    if (result or force) and submit:
+        judge.submit(submit)
 
 
 def main():
@@ -19,12 +47,9 @@ def main():
     """.format(__file__)
 
     argparser = ArgumentParser(usage=example)
-    argparser.add_argument('contest_type',
-                           type=str,
-                           help='コンテストの種類')
     argparser.add_argument('contest_id',
                            type=str,
-                           help='コンテスト番号')
+                           help='コンテストID')
     argparser.add_argument('problem_type',
                            type=str,
                            help='テスト対象の問題指定(a ~ f)')
@@ -47,18 +72,9 @@ def main():
 
     args = argparser.parse_args()
 
-    judge = Judge(args.contest_type,
-                  args.contest_id,
-                  args.problem_type)
-
-    if not args.debug:
-        result = judge.test_all(verbose=args.verbose, diff=args.error)
-    else:
-        judge.test_debug(args.debug)
-        return None
-
-    if (result or args.force) and args.submit:
-        judge.submit(args.submit)
+    judge(args.contest_id, args.problem_type,
+          args.verbose, args.error, args.debug,
+          args.submit, args.force)
 
 
 if __name__ == '__main__':

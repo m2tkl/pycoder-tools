@@ -40,7 +40,7 @@ def extract_prob_links(html: str) -> Dict[str, str]:
     @return prob_links 各問題のパス
     """
     soup = bs(html, 'html5lib')
-    prob_links = {'a': '', 'b': '', 'c': '', 'd': '', 'e': '', 'f': '', }
+    prob_links = {}
     for tr in soup.find('tbody').find_all('tr'):
         item = tr.find('td').find('a')
         p_type = item.contents[0].lower()
@@ -50,8 +50,7 @@ def extract_prob_links(html: str) -> Dict[str, str]:
 
 
 def extract_sample_test_cases_from_prob_page(
-        html: str
-    ) -> Dict[int, Tuple[str, str]]:
+        html: str) -> Dict[int, Tuple[str, str]]:
     """問題ページからサンプルテストケースを抽出する.
     @param html 問題ページ
     @return 問題ページのサンプルテストケース.

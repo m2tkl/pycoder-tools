@@ -112,18 +112,20 @@ class Judge:
             diff: float) -> Optional[str]:
         """targetプログラムに入力を与え,実行結果(出力)を返す.
         @param target 実行対象プログラムのpath
-        @param target_input 入力ファイルのpath
+        @param input_path テスト(入力)ファイルのpath
+        @param output_path テスト(出力)ファイルのpath
         @return res 実行結果(出力)
         """
-        command = ' '.join(['python', target, '<', input_path])
         try:
-            std = subprocess.run(
-                command,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                timeout=2.5,
-                shell=True,
-                check=True)
+            with open(input_path, 'r') as f:
+                std = subprocess.run(
+                    ['python', target],
+                    stdin=f,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    timeout=2.0,
+                    shell=False,
+                    check=True)
         except subprocess.TimeoutExpired:
             res = Result.TLE
             actual_output = None
@@ -195,7 +197,6 @@ class Judge:
 
     def submit(self, lang_type):
         ac = AtConnector()
-        ac.init_session()
         submit_code = read_file(self.target_src_path)
         ac.submit(self.contest_type,
                   self.contest_id,

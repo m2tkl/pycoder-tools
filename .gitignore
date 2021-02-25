@@ -4,3 +4,5 @@ htmlcov
 .coverage
 __pycache__
 .vscode
+*.egg-info
+*.dump
